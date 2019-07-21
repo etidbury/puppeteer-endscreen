@@ -10,6 +10,8 @@ import * as puppeteer from 'puppeteer-core'
 
 import { loadTestAction } from './lib/action';
 import loginViaGoogle from './scripts/loginViaGoogle';
+import createEndScreens from './scripts/createEndScreens';
+
 
 
 const { filterConsoleErrorNetworkInterrupts } = require('@etidbury/helpers/util/puppeteer')
@@ -87,6 +89,7 @@ const init = async () => {
         const action = await loadTestAction()
 
         await loginViaGoogle({ browser, page }, action)
+        await createEndScreens({ browser, page }, action)
 
 
         // if (filterConsoleErrorNetworkInterrupts(firedConsoleErrors).length) {

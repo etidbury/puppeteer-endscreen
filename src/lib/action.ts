@@ -4,7 +4,7 @@ import { gql } from 'apollo-boost'
 import Axios from "axios"
 import { EndScreenItem } from "../types";
 const urljoin = require('url-join')
-
+const fs = require('fs')
 //todo: specify via env var from ../config
 const BOT_MANAGER_GQL_URL = 'https://bot-manager-api.now.sh/graphql'
 
@@ -76,6 +76,9 @@ export const loadTestAction = async (): Promise<Action> => {
     if (!action || !action.actionProps) {
         throw new TypeError('Invalid action loaded from server')
     }
+
+    fs.writeFileSync('./action.json', JSON.stringify({ action }, null, 2))
+
     return action
 }
 
