@@ -15,14 +15,14 @@
   "author": "Edd Tidbury",
   "license": "ISC",
   "dependencies": {
-    "@etidbury/helpers": "^0.2.12",
+    "@etidbury/helpers": "^0.2.13",
     "apollo-boost": "^0.4.3",
     "axios": "^0.18.0",
     "chai": "^4.2.0",
     "dotenv": "^8.0.0",
     "dotenv-safe": "^6.1.0",
     "graphql": "^14.4.2",
-    "puppeteer": "1.11.0",
+    "puppeteer-core": "^1.18.1",
     "querystring": "^0.2.0",
     "ts-node": "^8.3.0",
     "typescript": "^3.5.3"

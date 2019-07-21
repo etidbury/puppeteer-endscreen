@@ -6,7 +6,7 @@ require('dotenv-safe').config({
     allowEmptyValues: true
 })
 
-import * as puppeteer from 'puppeteer'
+import * as puppeteer from 'puppeteer-core'
 
 import { loadTestAction } from './lib/action';
 import loginViaGoogle from './scripts/loginViaGoogle';
@@ -41,6 +41,7 @@ const init = async () => {
             headless: false,
             // dumpio:true,
             executablePath: process.env.PUPPETEER_EXECUTABLE_PATH ? process.env.PUPPETEER_EXECUTABLE_PATH : undefined
+            //executablePath: 'google-chrome-stable'
         })
 
         //const page = await browser.targets()[browser.targets().length - 1].page()
@@ -49,11 +50,11 @@ const init = async () => {
         await page.setRequestInterception(true)
         await page.setDefaultNavigationTimeout(30 * 1000)
 
-        // page.on('request', interceptedRequest => {
-        //     console.debug('Intercepted request URL:', interceptedRequest.url())
-        //     interceptedRequest.continue()
+        page.on('request', interceptedRequest => {
+            console.debug('Intercepted request URL:', interceptedRequest.url())
+            interceptedRequest.continue()
 
-        // })
+        })
 
         page.on('response', interceptedRequest => {
             //console.debug('Intercepted response URL:', interceptedRequest.url())
