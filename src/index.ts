@@ -8,7 +8,7 @@ require('dotenv-safe').config({
 
 import * as puppeteer from 'puppeteer-core'
 
-import { loadTestAction } from './lib/action';
+import { loadAction, saveTestAction } from './lib/action';
 import loginViaGoogle from './scripts/loginViaGoogle';
 import createEndScreens from './scripts/createEndScreens';
 
@@ -18,9 +18,13 @@ const { filterConsoleErrorNetworkInterrupts } = require('@etidbury/helpers/util/
 
 const init = async () => {
 
+
     let browser
     try {
 
+        if (process.env.SAVE_TEST_ACTION) {
+            await saveTestAction(process.env.SAVE_TEST_ACTION)
+        }
 
         browser = await puppeteer.launch({
             args: [
@@ -86,7 +90,7 @@ const init = async () => {
 
         console.debug('Running scripts...')
 
-        const action = await loadTestAction()
+        const action = await loadAction()
 
         await loginViaGoogle({ browser, page }, action)
         await createEndScreens({ browser, page }, action)

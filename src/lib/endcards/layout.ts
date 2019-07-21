@@ -1,8 +1,28 @@
 import { EDITABLE_ELEMENT_SELECTOR, ENDCARD_SAFE_AREA_SELECTOR } from "../../config";
 import { logEndScreenAction } from "../logs";
-import { moveEditableElement } from "../endscreen";
+
 import puppeteer from 'puppeteer'
 
+const _moveEditableElement = async (page, editableElement, moveToX, moveToY) => {
+
+    const { x, y, width, height } = await editableElement.boundingBox()
+
+    const selX = x + width / 2
+    const selY = y + height / 2
+
+    const selEndX = moveToX + width / 2
+    const selEndY = moveToY + height / 2
+
+    await page.mouse.move(selX, selY, { steps: 10 })
+
+    await page.mouse.down()
+
+    // const moveToX = boundingBox.x+boundingBox.width
+    await page.mouse.move(selEndX, selEndY, { steps: 50 })
+    await page.mouse.up()
+
+    await page.waitFor(1 * 1000)
+}
 
 export const createLayout1 = async (page: puppeteer.Page) => {
 
@@ -62,7 +82,7 @@ export const createLayout1 = async (page: puppeteer.Page) => {
         x:${moveToX}, y:${moveToY} - end screen safe area: x:${endScreenSafeArea.x} y:${endScreenSafeArea.y} 
         w:${endScreenSafeArea.width} h:${endScreenSafeArea.height}`)
 
-        await moveEditableElement(page, editableElements[0], moveToX, moveToY)
+        await _moveEditableElement(page, editableElements[0], moveToX, moveToY)
 
         logEndScreenAction(`Move End Card elements: Move ${i + 1}/${editableElements.length} element complete`)
 
@@ -92,7 +112,7 @@ export const createLayout1 = async (page: puppeteer.Page) => {
     const scaleToX = endScreenSafeArea.x + 5
     const scaleToY = endScreenSafeArea.y + subscribeEndCardHeight + 5
     // document.querySelectorAll('.editable-element-dragger.top-right')
-    await moveEditableElement(page, bestForViewerCardTopRightDragger, scaleToX, scaleToY)
+    await _moveEditableElement(page, bestForViewerCardTopRightDragger, scaleToX, scaleToY)
 
     await page.waitFor(2000)
 
@@ -166,7 +186,7 @@ export const createLayout2 = async (page: puppeteer.Page) => {
         logEndScreenAction(`Card details: w:${width} h:${height}`)
 
         // set to 0 because index changes when selecting editable elements
-        await moveEditableElement(page, editableElements[0], moveToX, moveToY)
+        await _moveEditableElement(page, editableElements[0], moveToX, moveToY)
 
         logEndScreenAction(`Move End Card elements: Move ${i + 1}/${editableElements.length} element complete`)
 
@@ -190,7 +210,7 @@ export const createLayout2 = async (page: puppeteer.Page) => {
     // const scaleToX = endScreenSafeArea.x+5
     // const scaleToY = endScreenSafeArea.y+subscribeEndCardHeight+5
     // //document.querySelectorAll('.editable-element-dragger.top-right')
-    // await moveEditableElement(page,bestForViewerCardTopRightDragger,scaleToX,scaleToY)
+    // await _moveEditableElement(page,bestForViewerCardTopRightDragger,scaleToX,scaleToY)
 
     // await page.waitFor(2000)
 

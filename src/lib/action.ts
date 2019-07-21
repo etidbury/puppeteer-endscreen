@@ -36,11 +36,12 @@ const _fetchGQLQueryBotManager = async (query: ASTNode, variables = {}): Promise
 
 
     } catch (err) {
+
         console.error('err', err && err.response && err.response.data || err && err.response || err)
         console.info('GQLQuery:', print(query))
         console.info('Variables:', variables)
 
-        throw new Error(`fetchGQLQueryEndScreen(): Error thrown trying to run Graphql query`)
+        throw new Error(`_fetchGQLQueryBotManager(): Error thrown trying to run Graphql query`)
     }
 
 }
@@ -48,28 +49,37 @@ const _fetchGQLQueryBotManager = async (query: ASTNode, variables = {}): Promise
 export interface Action {
     id: string
     actionProps: {
+        endScreenCampaignPrimaryCardURL: string
         endScreenCampaignId: string
         endScreenCampaignItems: [EndScreenItem]
     }
 }
-export const loadTestAction = async (): Promise<Action> => {
-    const response = await _fetchGQLQueryBotManager(gql`
-    query testAction($id:ID!) {
-        action(where:{
-            id:$id
-        }){
-            id
-            isQueued
-            hasExecuted
-            hasFailed
-            isCancelled
-            gitRepositoryURL
-            executedExitCode
-            envVars
-            actionProps
-        }
+const ACTION_FILE_PATH = './.tmp/action.json'
+
+export const saveTestAction = async (actionId?: string) => {
+
+    if (!actionId || !actionId.length) {
+        throw new TypeError('Invalid actionId specified')
     }
-`, { id: "cjyd1amnm0geq0a59bpixvd2x" })
+
+    console.debug('Saving test action with ID:', actionId)
+    const response = await _fetchGQLQueryBotManager(gql`
+        query testAction($id:ID!) {
+            action(where:{
+                id:$id
+            }){
+                id
+                isQueued
+                hasExecuted
+                hasFailed
+                isCancelled
+                gitRepositoryURL
+                executedExitCode
+                envVars
+                actionProps
+            }
+        }
+    `, { id: actionId })
 
     const { action } = response as any
 
@@ -77,7 +87,15 @@ export const loadTestAction = async (): Promise<Action> => {
         throw new TypeError('Invalid action loaded from server')
     }
 
-    fs.writeFileSync('./action.json', JSON.stringify({ action }, null, 2))
+    fs.writeFileSync(ACTION_FILE_PATH, JSON.stringify({ action }, null, 2))
+}
+
+export const loadAction = async (): Promise<Action> => {
+
+
+    const rawAction = fs.readFileSync(ACTION_FILE_PATH, 'utf-8')
+
+    const { action } = JSON.parse(rawAction)
 
     return action
 }

@@ -7,20 +7,38 @@ import { logEndScreenAction } from '../lib/logs';
 import { createCards } from '../lib/endcards/create'
 import { deleteEndCardElements } from '../lib/endcards/delete';
 import { createLayout1, createLayout2 } from '../lib/endcards/layout';
+import { updateEndScreenItem, EndScreenItemUpdateProps } from '../lib/api';
 
 const { interceptWaitForNetworkIdle } = require('@etidbury/helpers/util/puppeteer')
 
-const PRIMARY_CARD_URL = 'https://www.youtube.com/watch?v=kO8fTk6oKQg'
 
 export default async ({ page }: ScriptArgs, action: Action) => {
 
 
+    const primaryCardURL = action.actionProps.endScreenCampaignPrimaryCardURL
+
+    if (!primaryCardURL || !primaryCardURL.length) {
+        throw new TypeError('Invalid endScreenCampaignPrimaryCardURL specified in action.actionProps')
+    }
+
+
     for (let endScreenCampaignItemIndex = 0; endScreenCampaignItemIndex < action.actionProps.endScreenCampaignItems.length; endScreenCampaignItemIndex++) {
 
+        let _lastEndScreenCampaignItem: EndScreenItem | null = null
+
+        let _hasFailed = false
+        let _endCardLayoutApplied: string | null = null
         try {
 
 
             const endScreenCampaignItem: EndScreenItem = action.actionProps.endScreenCampaignItems[endScreenCampaignItemIndex]
+
+            _lastEndScreenCampaignItem = endScreenCampaignItem
+            await updateEndScreenItem(endScreenCampaignItem, {
+                isQueued: false,
+                hasFailed: false,
+                hasExecuted: false
+            })
 
             const targetVideoEndscreenEditorURL = generateEndScreenEditorURL(endScreenCampaignItem.youtubeVideoId)
 
@@ -56,7 +74,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
             await deleteEndCardElements(page)
 
             await createCards(page, {
-                primaryCardURL: PRIMARY_CARD_URL,
+                primaryCardURL,
                 primaryCard: true,
                 bestForViewerCard: true,
                 subscribeCard: true
@@ -76,7 +94,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                 await deleteEndCardElements(page)
 
                 await createCards(page, {
-                    primaryCardURL: PRIMARY_CARD_URL,
+                    primaryCardURL,
                     primaryCard: true,
                     bestForViewerCard: true,
                     subscribeCard: false //dont add subscribe button
@@ -88,6 +106,8 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
                 _usedLayout2 = true
             }
+
+            _endCardLayoutApplied = _usedLayout2 ? 'layout_2' : "layout_1"
 
 
             const isSaveBtnDisabledFromAllLayouts = await checkIsSaveButtonDisabled(page)
@@ -101,9 +121,37 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
             await page.click(BTN_SAVE_SELECTOR)
 
+            await interceptWaitForNetworkIdle(page, 5 * 1000)
+
+            await updateEndScreenItem(endScreenCampaignItem, {
+                isQueued: false,
+                hasFailed: false,
+                hasExecuted: false
+            })
 
         } catch (err) {
             console.error(err)
+            _hasFailed = true
+        } finally {
+
+            if (_lastEndScreenCampaignItem) {
+
+                const updateProps: EndScreenItemUpdateProps = {
+                    isQueued: false,
+                    hasFailed: _hasFailed,
+                    hasExecuted: true
+                }
+
+                if (_endCardLayoutApplied) {
+                    updateProps.endCardLayoutApplied = _endCardLayoutApplied
+                }
+
+                await updateEndScreenItem(_lastEndScreenCampaignItem, updateProps)
+
+                _lastEndScreenCampaignItem = null
+
+            }
+
         }
 
 
