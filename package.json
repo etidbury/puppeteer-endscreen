@@ -1,0 +1,37 @@
+{
+  "name": "puppeteer-endscreen",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node -r ts-node/register src/index.ts",
+    "dev": "$(npm root)/@etidbury/helpers/images/node-puppeteer/run-dev.sh \"yarn entrypoint\"",
+    "prod": "$(npm root)/@etidbury/helpers/images/node-puppeteer/run.sh \"yarn entrypoint\"",
+    "entrypoint": "nodemon --watch src/**/* --exec 'node -r ts-node/register --inspect=0.0.0.0 src/index.ts'",
+    "test:entrypoint": "nodemon --watch src/**/* --exec 'node -r ts-node/register --inspect=0.0.0.0 src/test.ts'",
+    "test": "$(npm root)/@etidbury/helpers/images/node-puppeteer/run-dev.sh \"yarn test:entrypoint\""
+  },
+  "keywords": [],
+  "author": "Edd Tidbury",
+  "license": "ISC",
+  "dependencies": {
+    "@etidbury/helpers": "^0.2.12",
+    "apollo-boost": "^0.4.3",
+    "axios": "^0.18.0",
+    "chai": "^4.2.0",
+    "dotenv": "^8.0.0",
+    "dotenv-safe": "^6.1.0",
+    "graphql": "^14.4.2",
+    "puppeteer": "1.11.0",
+    "querystring": "^0.2.0",
+    "ts-node": "^8.3.0",
+    "typescript": "^3.5.3"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.1.7",
+    "@types/expect-puppeteer": "^3.3.1",
+    "@types/node": "^12.6.2",
+    "@types/puppeteer": "^1.12.4",
+    "nodemon": "^1.18.9"
+  }
+}
