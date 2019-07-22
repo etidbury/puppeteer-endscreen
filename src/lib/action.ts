@@ -97,6 +97,8 @@ export const loadAction = async (): Promise<Action> => {
     console.log('ACTION_FILE_PATH', ACTION_FILE_PATH)
     const rawAction = fs.readFileSync(ACTION_FILE_PATH, 'utf-8')
 
+    console.debug('rawAction', rawAction)
+
     const { action } = JSON.parse(rawAction)
 
     if (!action || !action.id) {
