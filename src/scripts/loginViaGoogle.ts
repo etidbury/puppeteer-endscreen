@@ -11,7 +11,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
     await page.goto(homepage, { timeout: 60 * 1000 })
     console.debug('Waiting for network to be idle')
-    await interceptWaitForNetworkIdle(page, 5 * 1000)
+    //await interceptWaitForNetworkIdle(page, 5 * 1000)
     console.debug('Network now idle')
 
     const EXPECTED_TEXT = 'Sign in'
@@ -24,7 +24,9 @@ export default async ({ page }: ScriptArgs, action: Action) => {
         throw new Error(`Failed to find text '${EXPECTED_TEXT}' in body`)
     }
 
-    await page.click(LOGIN_EMAIL_SELECTOR)
+    await page.waitFor(LOGIN_EMAIL_SELECTOR)
+
+    await page.click(LOGIN_EMAIL_SELECTOR, { delay: 1000 })
     // await page.waitFor(3*1000)
     await page.type(LOGIN_EMAIL_SELECTOR, GOOGLE_USERNAME)
 
