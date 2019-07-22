@@ -5,6 +5,7 @@ import Axios from "axios"
 import { EndScreenItem } from "../types";
 const urljoin = require('url-join')
 const fs = require('fs')
+const path = require('path')
 //todo: specify via env var from ../config
 const BOT_MANAGER_GQL_URL = 'https://bot-manager-api.now.sh/graphql'
 
@@ -54,7 +55,7 @@ export interface Action {
         endScreenCampaignItems: [EndScreenItem]
     }
 }
-const ACTION_FILE_PATH = './.tmp/action.json'
+const ACTION_FILE_PATH = path.join(process.cwd(), '.tmp/action.json')
 
 export const saveTestAction = async (actionId?: string) => {
 
@@ -93,9 +94,14 @@ export const saveTestAction = async (actionId?: string) => {
 export const loadAction = async (): Promise<Action> => {
 
 
+    console.log('ACTION_FILE_PATH', ACTION_FILE_PATH)
     const rawAction = fs.readFileSync(ACTION_FILE_PATH, 'utf-8')
 
     const { action } = JSON.parse(rawAction)
+
+    if (!action || !action.id) {
+        throw new Error(`Failed to load action from ${ACTION_FILE_PATH}`)
+    }
 
     return action
 }
