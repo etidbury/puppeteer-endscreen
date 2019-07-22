@@ -88,7 +88,7 @@ export const saveTestAction = async (actionId?: string) => {
         throw new TypeError('Invalid action loaded from server')
     }
 
-    fs.writeFileSync(ACTION_FILE_PATH, JSON.stringify({ action }, null, 2))
+    fs.writeFileSync(ACTION_FILE_PATH, JSON.stringify(action, null, 2))
 }
 
 export const loadAction = async (): Promise<Action> => {
@@ -99,7 +99,7 @@ export const loadAction = async (): Promise<Action> => {
 
     console.debug('rawAction', rawAction)
 
-    const { action } = JSON.parse(rawAction)
+    const action = JSON.parse(rawAction)
 
     if (!action || !action.id) {
         throw new Error(`Failed to load action from ${ACTION_FILE_PATH}`)
