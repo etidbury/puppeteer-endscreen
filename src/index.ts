@@ -6,7 +6,7 @@ require('dotenv-safe').config({
     allowEmptyValues: true
 })
 
-import * as puppeteer from 'puppeteer-core'
+import * as puppeteer from 'puppeteer'
 
 import { loadAction, saveTestAction } from './lib/action';
 import loginViaGoogle from './scripts/loginViaGoogle';
