@@ -6,7 +6,7 @@ import { ENDSCREEN_BOT_GQL_URL } from '../config'
 import { gql } from "apollo-boost";
 import { EndScreenItem } from "../types";
 
-const _fetchGQLQueryEndScreen = async (query: ASTNode, variables = {}): Promise<any> => {
+export const fetchGQLQueryEndScreen = async (query: ASTNode, variables = {}): Promise<any> => {
     try {
 
         const { data: { data } } = await Axios.post(
@@ -57,7 +57,7 @@ export const updateEndScreenItem = async (endScreenCampaignItem: EndScreenItem, 
 
     updateProps.lastStatusUpdate = updateProps.lastStatusUpdate ? new Date(updateProps.lastStatusUpdate) : new Date()
 
-    return _fetchGQLQueryEndScreen(gql`
+    return fetchGQLQueryEndScreen(gql`
         mutation updateEndScreenCampaignItem($data:EndScreenCampaignItemUpdateInput! $endScreenCampaignItemId:ID!) {
                 updateEndScreenCampaignItem(data:$data,where:{
                     id:$endScreenCampaignItemId
@@ -72,6 +72,35 @@ export const updateEndScreenItem = async (endScreenCampaignItem: EndScreenItem, 
         `, {
             endScreenCampaignItemId: endScreenCampaignItem.id,
             data: Object.assign(updateProps, { lastStatusUpdate: updateProps.lastStatusUpdate.toISOString() })
+        })
+
+}
+
+
+export const createEndScreenArchiveIfNotExists = async (endScreenCampaignItem: EndScreenItem, archiveProps: Object) => {
+
+    return fetchGQLQueryEndScreen(gql`
+        mutation createEndScreenArchiveIfNotExists($create:EndScreenArchiveCreateInput! $update:EndScreenArchiveUpdateInput! $where:EndScreenArchiveWhereUniqueInput!){
+        upsertEndScreenArchive(create:$create, where:$where
+            update:$update
+        ) {
+            id
+            previousEndScreenProps
+            youtubeVideoId
+            }
+        }
+        `, {
+            "create": {
+                "youtubeVideoId": endScreenCampaignItem.youtubeVideoId,
+                "previousEndScreenProps": archiveProps
+            },
+            "update": {
+                "youtubeVideoId": endScreenCampaignItem.youtubeVideoId
+            }
+            ,
+            "where": {
+                "youtubeVideoId": endScreenCampaignItem.youtubeVideoId
+            }
         })
 
 }

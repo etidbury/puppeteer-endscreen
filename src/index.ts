@@ -11,6 +11,7 @@ import * as puppeteer from 'puppeteer'
 import { loadAction, saveTestAction } from './lib/action';
 import loginViaGoogle from './scripts/loginViaGoogle';
 import createEndScreens from './scripts/createEndScreens';
+import { createTestEndScreenCampaignAndAction } from './mock';
 
 
 
@@ -22,6 +23,10 @@ const init = async () => {
     let browser
     try {
 
+
+        if (process.env.MOCK_ACTION) {
+            await createTestEndScreenCampaignAndAction()
+        }
         if (process.env.SAVE_TEST_ACTION) {
             await saveTestAction(process.env.SAVE_TEST_ACTION)
         }
@@ -40,9 +45,6 @@ const init = async () => {
                 // '--enable-features=NetworkService',
                 '--allow-running-insecure-content',
                 '--disable-web-security',
-
-
-
             ],
             headless: false,
             // dumpio:true,

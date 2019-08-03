@@ -1,0 +1,58 @@
+{
+    "id": "cjydflwq70t670a59x2dh74l9",
+    "isQueued": false,
+    "hasExecuted": true,
+    "hasFailed": false,
+    "isCancelled": false,
+    "gitRepositoryURL": "https://github.com/etidbury/puppeteer-endscreen",
+    "executedExitCode": 0,
+    "envVars": {
+        "BASE_URL": "https://test-increment.now.sh"
+    },
+    "actionProps": {
+        "endScreenCampaignPrimaryCardURL": "https://www.youtube.com/watch?v=wFTMmf1aLi0",
+        "endScreenCampaignId": "cjydfhzge0sw20a59bepv0f0v",
+        "endScreenCampaignItems": [
+            {
+                "id": "cjydfi2bb0swh0a59cjbgbsdy",
+                "youtubeVideoId": "nTNXQK9q_r8"
+            },
+            {
+                "id": "cjydfi2mq0swj0a59xtyrb4u1",
+                "youtubeVideoId": "sQTS0PPjEBc"
+            },
+            {
+                "id": "cjydfi2ya0swl0a5985rr10y2",
+                "youtubeVideoId": "Evt2q0UsCzQ"
+            },
+            {
+                "id": "cjydfi39s0swn0a596y9rum49",
+                "youtubeVideoId": "IQKfljGiFGs"
+            },
+            {
+                "id": "cjydfi3l80swp0a594mnhbu86",
+                "youtubeVideoId": "0z7plUiAMAs"
+            },
+            {
+                "id": "cjydfi3wn0swr0a59gjspp90n",
+                "youtubeVideoId": "R4jxLK8evaU"
+            },
+            {
+                "id": "cjydfi4810swt0a59f857eztk",
+                "youtubeVideoId": "CsDhmCk_-q8"
+            },
+            {
+                "id": "cjydfi4jg0swv0a59bcnh1i7k",
+                "youtubeVideoId": "cUHGh-8CL3U"
+            },
+            {
+                "id": "cjydfi4uu0swx0a5979mr9nbg",
+                "youtubeVideoId": "wLFE20_hXvQ"
+            },
+            {
+                "id": "cjydfi5690swz0a59dq9kmh8d",
+                "youtubeVideoId": "vARgx_JmWPM"
+            }
+        ]
+    }
+}

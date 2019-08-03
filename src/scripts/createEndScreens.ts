@@ -50,6 +50,15 @@ export default async ({ page }: ScriptArgs, action: Action) => {
             await interceptWaitForNetworkIdle(page, 5 * 1000)
 
 
+            //createEndScreenArchiveIfNotExists
+
+            page.on('request', interceptedRequest => {
+
+                console.log('interceptrequest', interceptedRequest.url())
+            })
+
+
+
             const playerGridSafeArea = await page.$(ENDCARD_SAFE_AREA_SELECTOR)
             if (!playerGridSafeArea) {
                 throw Error('Failed to find playerGridSafeArea')
