@@ -7,7 +7,7 @@ import { logEndScreenAction } from '../lib/logs';
 import { createCards } from '../lib/endcards/create'
 import { deleteEndCardElements } from '../lib/endcards/delete';
 import { createLayout1, createLayout2 } from '../lib/endcards/layout';
-import { updateEndScreenItem, EndScreenItemUpdateProps } from '../lib/api';
+import { updateEndScreenItem, EndScreenItemUpdateProps, createEndScreenArchiveIfNotExists } from '../lib/api';
 
 const { interceptWaitForNetworkIdle } = require('@etidbury/helpers/util/puppeteer')
 
@@ -52,10 +52,18 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
             //createEndScreenArchiveIfNotExists
 
-            page.on('request', interceptedRequest => {
 
-                console.log('interceptrequest', interceptedRequest.url())
-            })
+
+
+            // page.on('response', interceptedResponse => {
+
+            //     //console.log('interceptrequest', interceptedRequest.url())
+
+
+            //     if (interceptedResponse.url().toLowerCase().indexOf('youtube.com/endscreen_ajax') > -1) {
+            //         console.debug('intercepted', interceptedResponse)
+            //     }
+            // })
 
 
 
@@ -126,9 +134,70 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                 throw new Error(`Failed to create a layout suitable for video ${targetVideoId}`)
             }
 
+
+
+
             logEndScreenAction('Clicking save')
 
             await page.click(BTN_SAVE_SELECTOR)
+
+            await new Promise((resolve, reject) => {
+
+                setTimeout(reject, 30 * 1000)
+
+                page.on('request', async interceptedRequest => {
+
+                    try {
+
+
+                        console.log('interceptrequest', interceptedRequest.url())
+                        const post = interceptedRequest.postData() as any
+
+                        if (interceptedRequest.url().toLowerCase().indexOf('youtube.com/endscreen_ajax') > -1
+
+                            // && post && post.indexOf('endscreen=') > -1
+                        ) {
+
+
+
+                            if (!post) {
+                                console.log('no post', post)
+                                return
+                            }
+
+                            try {
+
+                                let endScreenData = JSON.parse(post)
+
+                                if (endScreenData.elements && endScreenData.elements.length) {
+                                    console.debug('intecepred postdata end screen data', endScreenData)
+
+                                    await createEndScreenArchiveIfNotExists(endScreenCampaignItem, endScreenData).catch((err) => {
+                                        reject(err)
+                                    })
+
+                                    resolve()
+                                }
+
+                            } catch (err) {
+
+                                //if failed to pass, treat as an endscreen_ajax update that is not relevant.
+
+                                console.error('Failed to parse end screen post data. Ignoring')
+
+                            }
+
+
+
+                        }
+                    } catch (err) {
+                        console.error('Failed to save end screen post data')
+                        reject(err)
+                    }
+                })
+
+
+            })
 
             await interceptWaitForNetworkIdle(page, 5 * 1000)
 

@@ -61,10 +61,11 @@ const init = async () => {
         page.on('request', interceptedRequest => {
             //console.debug('Intercepted request URL:', interceptedRequest.url())
             interceptedRequest.continue()
-
         })
 
         page.on('response', interceptedRequest => {
+
+
             //console.debug('Intercepted response URL:', interceptedRequest.url())
         })
 

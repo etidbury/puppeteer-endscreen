@@ -1,6 +1,6 @@
 const path = require('path')
 require('dotenv-safe').config({ path: path.join(process.cwd(), process.env.ENV_FILE || '.env'), debug: process.env.DEBUG })
-const fs = require('fs')
+const fse = require('fs-extra')
 
 const fetch = require('isomorphic-fetch');
 
@@ -9,7 +9,7 @@ const { Action, updateActionStatus, updateAction, createAction } = require('@eti
 import { fetchGQLQueryEndScreen } from '../lib/api'
 import { gql } from 'apollo-boost'
 
-const testVideoIdListTxt = fs.readFileSync(__dirname + '/test-video-list.txt', 'utf-8')
+const testVideoIdListTxt = fse.readFileSync(__dirname + '/test-video-list.txt', 'utf-8')
 
 export const createTestEndScreenCampaignAndAction = async () => {
 
@@ -59,7 +59,6 @@ export const createTestEndScreenCampaignAndAction = async () => {
         throw Error('Failed to create test end screen campaign')
     }
 
-
     const action = {
         gitRepositoryURL: "https://github.com/etidbury/puppeteer-endscreen",
         actionProps: {
@@ -78,8 +77,11 @@ export const createTestEndScreenCampaignAndAction = async () => {
 
     const createdAction = await createAction(action)
 
+    const TMP_DIR = path.join(process.cwd(), './.tmp/')
 
-    fs.writeFileSync('./tmp/action2.json', JSON.stringify(createdAction, null, 2))
+    fse.mkdirp(TMP_DIR)
+
+    fse.writeFileSync(path.join(TMP_DIR, 'action.json'), JSON.stringify(createdAction, null, 2))
 
 
     return createdAction
