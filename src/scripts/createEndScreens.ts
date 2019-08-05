@@ -152,7 +152,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
             })
 
         } catch (err) {
-            console.error(err)
+            console.error('Error occurred', err)
             _hasFailed = true
         } finally {
 

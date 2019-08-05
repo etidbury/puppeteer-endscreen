@@ -8,27 +8,30 @@ import { checkIsSaveButtonDisabled } from '../endscreen';
 const _interceptEndCardSave = async (page: puppeteer.Page, endScreenCampaignItem: EndScreenItem) => {
 
 
-    let _finished
+    let _finished = false
 
 
-    await new Promise((resolve, reject) => {
+    await new Promise(async (resolve, reject) => {
 
 
         const _resolve = (e?: any) => {
+            console.debug('_interceptEndCardSave() / _resolve()')
             _finished = true
             resolve(e)
         }
         const _reject = (e?: any) => {
+            console.debug('_interceptEndCardSave() / _reject()', e)
             _finished = true
             reject(e)
         }
 
-        setTimeout(_reject, 30 * 1000)
+        setTimeout(() => {
+            _reject(new Error('_interceptEndCardSave(): timeout'))
+        }, 30 * 1000)
 
 
-        page.on('request', async interceptedRequest => {
+        const onReq = async interceptedRequest => {
 
-            //todo: find a way of improving this e.g. by using page.off('request')
             if (_finished) {
                 return
             }
@@ -68,6 +71,8 @@ const _interceptEndCardSave = async (page: puppeteer.Page, endScreenCampaignItem
 
                     }
 
+                    _resolve()
+
 
 
                 }
@@ -75,10 +80,17 @@ const _interceptEndCardSave = async (page: puppeteer.Page, endScreenCampaignItem
                 console.error('Failed to save end screen post data')
                 _reject(err)
             }
-        })
+        }
 
+        page.removeListener('request', onReq)
+        page.on('request', onReq)
+
+        logEndScreenAction('Clicking save for archiving')
+        await page.click(BTN_SAVE_SELECTOR)
 
     })
+
+    console.debug('_interceptEndCardSave():', 'finished')
 
 }
 
@@ -130,12 +142,9 @@ export const createEndScreenArchive = async (page: puppeteer.Page, endScreenCamp
 
     await _triggerEnableEndCardSaving(page)
 
-    logEndScreenAction('Clicking save for archiving')
-    await page.click(BTN_SAVE_SELECTOR)
-
-
     await _interceptEndCardSave(page, endScreenCampaignItem)
 
+    logEndScreenAction('Finished archiving')
     await page.waitFor(2 * 1000)
 
 }

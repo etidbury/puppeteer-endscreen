@@ -59,7 +59,8 @@ const init = async () => {
         await page.setDefaultNavigationTimeout(30 * 1000)
 
         page.on('request', interceptedRequest => {
-            //console.debug('Intercepted request URL:', interceptedRequest.url())
+            // console.debug('Intercepted request URL:', interceptedRequest.url())
+
             interceptedRequest.continue()
         })
 
