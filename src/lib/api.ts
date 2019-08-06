@@ -53,6 +53,29 @@ export interface EndScreenItemUpdateProps {
     lastStatusUpdate?: Date
 }
 
+
+export const checkIsEndScreenItemMarkedAsCancelled = async (endScreenCampaignItem: EndScreenItem) => {
+
+    const result = await fetchGQLQueryEndScreen(gql`
+       query checkEndScreenCampaignItemCancelled($endScreenCampaignItemId:ID!) {
+            endScreenCampaignItem(where:{
+                id:$endScreenCampaignItemId
+            }) {
+                id
+                isCancelled
+                }
+        }
+        `, {
+            endScreenCampaignItemId: endScreenCampaignItem.id
+        })
+
+    console.debug('checkIsEndScreenItemMarkedAsCancelled(): result', result)
+
+
+    return result.isCancelled
+
+}
+
 export const updateEndScreenItem = async (endScreenCampaignItem: EndScreenItem, updateProps: EndScreenItemUpdateProps) => {
 
     updateProps.lastStatusUpdate = updateProps.lastStatusUpdate ? new Date(updateProps.lastStatusUpdate) : new Date()

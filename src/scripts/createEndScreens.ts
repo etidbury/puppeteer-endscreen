@@ -7,7 +7,7 @@ import { logEndScreenAction } from '../lib/logs';
 import { createCards } from '../lib/endcards/create'
 import { deleteEndCardElements } from '../lib/endcards/delete';
 import { createLayout1, createLayout2 } from '../lib/endcards/layout';
-import { updateEndScreenItem, EndScreenItemUpdateProps, createEndScreenArchiveIfNotExists } from '../lib/api';
+import { updateEndScreenItem, EndScreenItemUpdateProps, createEndScreenArchiveIfNotExists, checkIsEndScreenItemMarkedAsCancelled } from '../lib/api';
 import { createEndScreenArchive } from '../lib/endcards/archive';
 
 const { interceptWaitForNetworkIdle } = require('@etidbury/helpers/util/puppeteer')
@@ -40,6 +40,19 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                 hasFailed: false,
                 hasExecuted: false
             })
+
+            const endScreenItemIsCancelled = await checkIsEndScreenItemMarkedAsCancelled(endScreenCampaignItem)
+
+
+            if (endScreenItemIsCancelled) {
+                await updateEndScreenItem(endScreenCampaignItem, {
+                    isQueued: false,
+                    hasFailed: false,
+                    hasExecuted: true
+                })
+                console.debug('End screen item has been cancelled', endScreenCampaignItem)
+                return
+            }
 
             const targetVideoEndscreenEditorURL = generateEndScreenEditorURL(endScreenCampaignItem.youtubeVideoId)
 
