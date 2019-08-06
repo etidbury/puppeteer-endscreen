@@ -5,6 +5,7 @@ import { EDITABLE_ELEMENT_SELECTOR, BTN_SAVE_SELECTOR } from '../../config';
 import { logEndScreenAction } from '../logs'
 import { checkIsSaveButtonDisabled } from '../endscreen';
 
+let _to
 const _interceptEndCardSave = async (page: puppeteer.Page, endScreenCampaignItem: EndScreenItem) => {
 
 
@@ -25,7 +26,12 @@ const _interceptEndCardSave = async (page: puppeteer.Page, endScreenCampaignItem
             reject(e)
         }
 
-        setTimeout(() => {
+        clearTimeout(_to)
+
+        _to = setTimeout(() => {
+            if (_finished) {
+                return
+            }
             _reject(new Error('_interceptEndCardSave(): timeout'))
         }, 30 * 1000)
 
