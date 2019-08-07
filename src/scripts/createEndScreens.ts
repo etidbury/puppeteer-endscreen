@@ -200,10 +200,10 @@ export default async ({ page }: ScriptArgs, action: Action) => {
             }
 
 
-        }
+        }//end finally
 
 
 
 
-    }
+    }//endfor 
 }
