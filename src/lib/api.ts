@@ -75,8 +75,11 @@ export const checkIsEndScreenItemMarkedAsCancelled = async (endScreenCampaignIte
 
 export const checkIsEndScreenCampaignMarkedAsCancelled = async (endScreenCampaignId: string) => {
 
+    if (!endScreenCampaignId || !endScreenCampaignId.length) {
+        throw new TypeError('You need to specify an end screen campaign ID')
+    }
     const result = await fetchGQLQueryEndScreen(gql`
-       query checkEndScreenCampaignItemCancelled($endScreenCampaignItemId:ID!) {
+       query checkEndScreenCampaignCancelled($endScreenCampaignId:ID!) {
             endScreenCampaign(where:{
                 id:$endScreenCampaignItemId
             }) {
