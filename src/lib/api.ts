@@ -69,7 +69,9 @@ export const checkIsEndScreenItemMarkedAsCancelled = async (endScreenCampaignIte
             endScreenCampaignItemId: endScreenCampaignItem.id
         })
 
-    return result.isCancelled
+    console.debug('checkIsEndScreenItemMarkedAsCancelled()', result, result.endScreenCampaignItem.isCancelled)
+
+    return result.endScreenCampaignItem.isCancelled
 
 }
 
@@ -90,9 +92,10 @@ export const checkIsEndScreenCampaignMarkedAsCancelled = async (endScreenCampaig
         `, {
             endScreenCampaignId: endScreenCampaignId
         })
-    console.debug('checkIsEndScreenCampaignMarkedAsCancelled()', result, result.isCancelled)
 
-    return result.isCancelled
+    console.debug('checkIsEndScreenCampaignMarkedAsCancelled()', result, result.endScreenCampaign.isCancelled)
+
+    return result.endScreenCampaign.isCancelled
 
 }
 
