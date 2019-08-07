@@ -69,12 +69,28 @@ export const checkIsEndScreenItemMarkedAsCancelled = async (endScreenCampaignIte
             endScreenCampaignItemId: endScreenCampaignItem.id
         })
 
-    console.debug('checkIsEndScreenItemMarkedAsCancelled(): result', result)
-
-
     return result.isCancelled
 
 }
+
+export const checkIsEndScreenCampaignMarkedAsCancelled = async (endScreenCampaignId: string) => {
+
+    const result = await fetchGQLQueryEndScreen(gql`
+       query checkEndScreenCampaignItemCancelled($endScreenCampaignItemId:ID!) {
+            endScreenCampaign(where:{
+                id:$endScreenCampaignItemId
+            }) {
+                id
+                isCancelled
+                }
+        }
+        `, {
+            endScreenCampaignId: endScreenCampaignId
+        })
+    return result.isCancelled
+
+}
+
 
 export const updateEndScreenItem = async (endScreenCampaignItem: EndScreenItem, updateProps: EndScreenItemUpdateProps) => {
 
