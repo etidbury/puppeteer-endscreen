@@ -58,28 +58,25 @@ const init = async () => {
         await page.setRequestInterception(true)
         await page.setDefaultNavigationTimeout(30 * 1000)
 
-        page.on('request', interceptedRequest => {
+        const intReq = interceptedRequest => {
             // console.debug('Intercepted request URL:', interceptedRequest.url())
 
             interceptedRequest.continue()
-        })
+        }
+        page.removeListener('request', intReq)
+        page.on('request', intReq)
 
-        page.on('response', interceptedRequest => {
-
-
-            //console.debug('Intercepted response URL:', interceptedRequest.url())
-        })
-
-        //monitor for console errors
-        const firedConsoleErrors = []
-        page.on('console', async msg => {
-            if (msg.type() === "error") {
-                firedConsoleErrors.push(msg as never)
-            }
-        })
+        // //monitor for console errors
+        // const firedConsoleErrors = []
+        // page.on('console', async msg => {
+        //     if (msg.type() === "error") {
+        //         firedConsoleErrors.push(msg as never)
+        //     }
+        // })
 
         //accept all dialogs
-        page.on('dialog', async dialog => {
+
+        const onDialog = async dialog => {
             try {
 
                 console.log('dialog message:', dialog.message())
@@ -88,7 +85,9 @@ const init = async () => {
             } catch (err) {
                 // do nothing
             }
-        })
+        }
+        page.removeListener('dialog', onDialog)
+        page.on('dialog', onDialog)
 
         await page.setViewport({ width: 1282, height: 701 })
 
