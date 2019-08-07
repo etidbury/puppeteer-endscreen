@@ -22,13 +22,18 @@ export default async ({ page }: ScriptArgs, action: Action) => {
         throw new TypeError('Invalid endScreenCampaignPrimaryCardURL specified in action.actionProps')
     }
 
+    let _endScreenCampaignIsCancelled
 
     for (let endScreenCampaignItemIndex = 0; endScreenCampaignItemIndex < action.actionProps.endScreenCampaignItems.length; endScreenCampaignItemIndex++) {
 
         let _lastEndScreenCampaignItem: EndScreenItem | null = null
 
+        let _lastEndScreenCampaignItemCancelled = false
+
         let _hasFailed = false
         let _endCardLayoutApplied: string | null = null
+
+
         try {
 
 
@@ -43,9 +48,13 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
 
             const endScreenItemIsCancelled = await checkIsEndScreenItemMarkedAsCancelled(endScreenCampaignItem)
-            const endScreenCampaignIsCancelled = await checkIsEndScreenCampaignMarkedAsCancelled(action.actionProps.endScreenCampaignId)
+            _endScreenCampaignIsCancelled = await checkIsEndScreenCampaignMarkedAsCancelled(action.actionProps.endScreenCampaignId)
 
-            if (endScreenCampaignIsCancelled) {
+            if (_endScreenCampaignIsCancelled || endScreenItemIsCancelled) {
+                _lastEndScreenCampaignItemCancelled = true
+            }
+
+            if (_endScreenCampaignIsCancelled) {
                 console.debug('End screen campaign has been cancelled')
                 break;
             }
@@ -160,11 +169,6 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
             await interceptWaitForNetworkIdle(page, 5 * 1000)
 
-            await updateEndScreenItem(endScreenCampaignItem, {
-                isQueued: false,
-                hasFailed: false,
-                hasExecuted: false
-            })
 
         } catch (err) {
             console.error('Error occurred', err)
@@ -174,6 +178,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
             if (_lastEndScreenCampaignItem) {
 
                 const updateProps: EndScreenItemUpdateProps = {
+                    isCancelled: _lastEndScreenCampaignItemCancelled,
                     isQueued: false,
                     hasFailed: _hasFailed,
                     hasExecuted: true
