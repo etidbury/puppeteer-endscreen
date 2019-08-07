@@ -90,7 +90,7 @@ export const checkIsEndScreenCampaignMarkedAsCancelled = async (endScreenCampaig
         `, {
             endScreenCampaignId: endScreenCampaignId
         })
-    console.debug('checkIsEndScreenCampaignMarkedAsCancelled()', result)
+    console.debug('checkIsEndScreenCampaignMarkedAsCancelled()', result, result.isCancelled)
 
     return result.isCancelled
 
