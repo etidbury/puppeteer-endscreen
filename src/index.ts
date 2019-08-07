@@ -46,6 +46,7 @@ const init = async () => {
                 '--allow-running-insecure-content',
                 '--disable-web-security',
             ],
+            timeout: 60 * 1000,
             headless: false,
             // dumpio:true,
             executablePath: process.env.PUPPETEER_EXECUTABLE_PATH ? process.env.PUPPETEER_EXECUTABLE_PATH : undefined
