@@ -56,7 +56,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
             if (_endScreenCampaignIsCancelled) {
                 console.debug('End screen campaign has been cancelled')
-                break;
+                return
             }
 
 
@@ -193,6 +193,12 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                 _lastEndScreenCampaignItem = null
 
             }
+
+            if (_endScreenCampaignIsCancelled) {
+                console.debug('End screen campaign has been cancelled. Discontinuing...')
+                break
+            }
+
 
         }
 
