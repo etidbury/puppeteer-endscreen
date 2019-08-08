@@ -26,6 +26,11 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
     for (let endScreenCampaignItemIndex = 0; endScreenCampaignItemIndex < action.actionProps.endScreenCampaignItems.length; endScreenCampaignItemIndex++) {
 
+        if (_endScreenCampaignIsCancelled) {
+            console.debug('Not continuing because campaign is cancelled...')
+            break;
+        }
+
         let _lastEndScreenCampaignItem: EndScreenItem | null = null
 
         let _lastEndScreenCampaignItemCancelled = false
