@@ -7,10 +7,15 @@ export interface CreateCardOptions {
     primaryCardURL: string,
     primaryCard: boolean,
     bestForViewerCard: boolean,
-    subscribeCard: boolean
+    subscribeCard: boolean,
+    secondaryCard: boolean,
+    secondaryCardURL?: string
 }
 
-export const createCards = async (page: puppeteer.Page, { primaryCardURL, primaryCard = false, bestForViewerCard = false, subscribeCard = false, }: CreateCardOptions) => {
+export const createCards = async (page: puppeteer.Page, { primaryCardURL, primaryCard = false,
+    bestForViewerCard = false, subscribeCard = false,
+    secondaryCard = false, secondaryCardURL
+}: CreateCardOptions) => {
 
     let inputs
     let createBtns
@@ -18,7 +23,7 @@ export const createCards = async (page: puppeteer.Page, { primaryCardURL, primar
     if (primaryCard) {
 
         // create specific video url end screen screen
-        logEndScreenAction('Create Video URL End Card element: Processing...')
+        logEndScreenAction('Create Primary End Card element: Processing...')
         await page.waitForSelector('#endscreen-editor-add-element')
         await page.click('#endscreen-editor-add-element')
         await page.waitFor(2 * 1000)
@@ -32,7 +37,7 @@ export const createCards = async (page: puppeteer.Page, { primaryCardURL, primar
         inputs = await page.$$(INPUT_VIDEO_URL_SELECTOR)
         await inputs[1].type(`${primaryCardURL}`)
         await inputs[1].type(String.fromCharCode(13))
-        logEndScreenAction('Create Video URL End Card element: Complete')
+        logEndScreenAction('Create Primary End Card element: Complete')
 
         await page.waitFor(5 * 1000)
     }
@@ -75,5 +80,31 @@ export const createCards = async (page: puppeteer.Page, { primaryCardURL, primar
         await inputs[1].type(String.fromCharCode(13))
         logEndScreenAction('Create Subscribe End Card element: Complete')
     }
+
+
+
+
+    if (secondaryCard) {
+
+        // create specific video url end screen screen
+        logEndScreenAction('Create secondary card element: Processing...')
+        await page.waitForSelector('#endscreen-editor-add-element')
+        await page.click('#endscreen-editor-add-element')
+        await page.waitFor(2 * 1000)
+        await page.waitForSelector('.annotator-create-button')
+        await page.click('.annotator-create-button')
+        await page.waitForSelector('#annotator-video-type-fixed')
+        await page.click('#annotator-video-type-fixed')
+        await page.waitForSelector('#annotator-video-type-fixed')
+        await page.click('#annotator-video-type-fixed')
+        await page.waitFor(2 * 1000)
+        inputs = await page.$$(INPUT_VIDEO_URL_SELECTOR)
+        await inputs[1].type(`${secondaryCardURL}`)
+        await inputs[1].type(String.fromCharCode(13))
+        logEndScreenAction('Create secondary card element: Complete')
+
+        await page.waitFor(5 * 1000)
+    }
+
 
 }

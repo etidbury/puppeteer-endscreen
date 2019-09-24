@@ -125,7 +125,9 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                 primaryCardURL,
                 primaryCard: true,
                 bestForViewerCard: true,
-                subscribeCard: true
+                subscribeCard: true,
+                secondaryCard: true,
+                secondaryCardURL: "https://www.youtube.com/watch?v=XJQy_R9CYR4&list=PL2vrmw2gup2Jre1MK2FL72rQkzbQzFnFM"
             })
 
             await createLayout1(page)
@@ -145,7 +147,8 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                     primaryCardURL,
                     primaryCard: true,
                     bestForViewerCard: true,
-                    subscribeCard: false //dont add subscribe button
+                    subscribeCard: false, //dont add subscribe button,
+                    secondaryCard: false
                 })
 
                 await page.waitFor(5 * 1000)

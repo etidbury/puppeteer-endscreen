@@ -61,15 +61,38 @@ export const createLayout1 = async (page: puppeteer.Page) => {
         switch (i) {
             case 0: // sub button
                 moveToX = endScreenSafeArea.x
-                moveToY = endScreenSafeArea.y + 10
+                moveToY = endScreenSafeArea.y
                 break
-            case 1: // best for viewer
+            case 2: // best for viewer
                 moveToX = endScreenSafeArea.x
-                moveToY = endScreenSafeArea.y + endScreenSafeArea.height - height - 10
+                moveToY = endScreenSafeArea.y + endScreenSafeArea.height - height
                 break
-            case 2: // custom link
-                moveToX = endScreenSafeArea.x + endScreenSafeArea.width - width - 10
-                moveToY = endScreenSafeArea.y + (endScreenSafeArea.height / 2 - height / 2)
+            case 3: // primary
+
+                /*------middle-right------*/
+                // moveToX = endScreenSafeArea.x + endScreenSafeArea.width - width - 10
+                // moveToY = endScreenSafeArea.y + (endScreenSafeArea.height / 2 - height / 2)
+                /*------/middle-right------*/
+
+                /*----top right----*/
+                moveToX = endScreenSafeArea.x + endScreenSafeArea.width - width
+                moveToY = endScreenSafeArea.y
+                /*-----------------*/
+
+                break
+
+            case 1: // secondary
+
+                /*------middle-right------*/
+                // moveToX = endScreenSafeArea.x + endScreenSafeArea.width - width - 10
+                // moveToY = endScreenSafeArea.y + (endScreenSafeArea.height / 2 - height / 2)
+                /*------/middle-right------*/
+
+                /*----bottom right----*/
+                moveToX = endScreenSafeArea.x + endScreenSafeArea.width - width
+                moveToY = endScreenSafeArea.y + endScreenSafeArea.height - height
+                /*-----------------*/
+
                 break
             default:
                 throw new Error(`Move coordinates not set for editable element ${i}`)
