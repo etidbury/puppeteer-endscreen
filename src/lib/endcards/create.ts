@@ -87,7 +87,7 @@ export const createCards = async (page: puppeteer.Page, { primaryCardURL, primar
     if (secondaryCard) {
 
         // create specific video url end screen screen
-        logEndScreenAction('Create secondary card element: Processing...')
+        logEndScreenAction('Create secondary card element: secondaryCardURL - Processing...')
         await page.waitForSelector('#endscreen-editor-add-element')
         await page.click('#endscreen-editor-add-element')
         await page.waitFor(2 * 1000)

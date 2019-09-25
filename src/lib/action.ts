@@ -51,6 +51,7 @@ export interface Action {
     id: string
     actionProps: {
         endScreenCampaignPrimaryCardURL: string
+        endScreenCampaignSecondaryCardURL: string
         endScreenCampaignId: string
         endScreenCampaignItems: [EndScreenItem]
     }

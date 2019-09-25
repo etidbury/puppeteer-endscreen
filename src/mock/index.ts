@@ -26,6 +26,7 @@ export const createTestEndScreenCampaignAndAction = async () => {
                 createEndScreenCampaign(data:$data) {
                     id
                     primaryCardURL
+                    secondaryCardURL
                     items {
                         id
                         youtubeVideoId
@@ -33,22 +34,23 @@ export const createTestEndScreenCampaignAndAction = async () => {
                 }
             }
         `, {
-                data: {
-                    primaryCardURL: "https://www.youtube.com/watch?v=chSZCtLrgz8",
-                    notes: "testcampaign from puppeteer-endscreen test",
-                    uploadedCSVFileReference: "not_a_file.csv",
-                    items:
-                    {
-                        create: testVideoIdList.map((testVideoId) => {
-                            return {
-                                youtubeVideoId: testVideoId
-                            }
-                        })
-                    }
-
-                    //lastImportClaimDate:new Date().toISOString()
+            data: {
+                primaryCardURL: "https://www.youtube.com/watch?v=chSZCtLrgz8",
+                secondaryCardURL: "https://www.youtube.com/watch?v=XJQy_R9CYR4&list=PL2vrmw2gup2Jre1MK2FL72rQkzbQzFnFM",
+                notes: "testcampaign from puppeteer-endscreen test",
+                uploadedCSVFileReference: "not_a_file.csv",
+                items:
+                {
+                    create: testVideoIdList.map((testVideoId) => {
+                        return {
+                            youtubeVideoId: testVideoId
+                        }
+                    })
                 }
-            })
+
+                //lastImportClaimDate:new Date().toISOString()
+            }
+        })
 
         console.log(createEndScreenCampaign.id)
 
@@ -64,6 +66,7 @@ export const createTestEndScreenCampaignAndAction = async () => {
         actionProps: {
             endScreenCampaignId: queuedEndScreenCampaign.id,
             endScreenCampaignPrimaryCardURL: queuedEndScreenCampaign.primaryCardURL,
+            endScreenCampaignSecondaryCardURL: queuedEndScreenCampaign.secondaryCardURL,
             endScreenCampaignItems: queuedEndScreenCampaign.items
         },
         tags: `endscreen,endScreenCampaignId:${queuedEndScreenCampaign.id}`,

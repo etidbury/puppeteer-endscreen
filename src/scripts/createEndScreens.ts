@@ -17,6 +17,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
 
     const primaryCardURL = action.actionProps.endScreenCampaignPrimaryCardURL
+    const secondaryCardURL = action.actionProps.endScreenCampaignSecondaryCardURL
 
     if (!primaryCardURL || !primaryCardURL.length) {
         throw new TypeError('Invalid endScreenCampaignPrimaryCardURL specified in action.actionProps')
@@ -121,13 +122,17 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
             await deleteEndCardElements(page)
 
+
+
+
+
             await createCards(page, {
                 primaryCardURL,
                 primaryCard: true,
                 bestForViewerCard: true,
                 subscribeCard: true,
-                secondaryCard: true,
-                secondaryCardURL: "https://www.youtube.com/watch?v=XJQy_R9CYR4&list=PL2vrmw2gup2Jre1MK2FL72rQkzbQzFnFM"
+                secondaryCard: !!secondaryCardURL && secondaryCardURL.length > 0,
+                secondaryCardURL: secondaryCardURL
             })
 
             await createLayout1(page)
@@ -158,7 +163,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                 _usedLayout2 = true
             }
 
-            _endCardLayoutApplied = _usedLayout2 ? 'layout_2' : "layout_1"
+            _endCardLayoutApplied = _usedLayout2 ? 'layout_2' : "layout_1a"
 
 
             const isSaveBtnDisabledFromAllLayouts = await checkIsSaveButtonDisabled(page)
