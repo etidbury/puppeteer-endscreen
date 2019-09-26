@@ -152,12 +152,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
             const alertErrorElement = await page.$('.yt-alert-content')
 
-            console.log('alerterrorelement', alertErrorElement)
-            const hasExceededMaxNumElements = await page.evaluate(
-                (alertErrorElement) => {
-                    return alertErrorElement && alertErrorElement.innerHTML && alertErrorElement.innerHTML.indexOf("exceeded") > -1
-                }
-                , alertErrorElement)
+            const hasExceededMaxNumElements = !!alertErrorElement
 
             if (hasExceededMaxNumElements) {
                 logEndScreenAction("Has found error message specifying exceeded max number of elements")
