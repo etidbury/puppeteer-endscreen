@@ -173,7 +173,10 @@ export default async ({ page }: ScriptArgs, action: Action) => {
             if (_hasFailedToCreateInitialCards) {
 
                 logEndScreenAction("Closing select element overlay")
-                await page.click('.yt-uix-overlay-close')
+
+                const saveBtnElement = await page.$('.yt-uix-overlay-close')[0]
+                await saveBtnElement.click()
+
                 await page.waitFor(1000)
 
             }
