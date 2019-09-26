@@ -63,6 +63,7 @@ export const createTestEndScreenCampaignAndAction = async () => {
 
     const action = {
         gitRepositoryURL: "https://github.com/etidbury/puppeteer-endscreen",
+        gitBranch: "edd2",
         actionProps: {
             endScreenCampaignId: queuedEndScreenCampaign.id,
             endScreenCampaignPrimaryCardURL: queuedEndScreenCampaign.primaryCardURL,

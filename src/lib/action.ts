@@ -76,6 +76,7 @@ export const saveTestAction = async (actionId?: string) => {
                 hasFailed
                 isCancelled
                 gitRepositoryURL
+                gitBranch
                 executedExitCode
                 envVars
                 actionProps
