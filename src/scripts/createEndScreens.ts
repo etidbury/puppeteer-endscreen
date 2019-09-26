@@ -6,7 +6,7 @@ import { logEndScreenAction } from '../lib/logs';
 
 import { createCards } from '../lib/endcards/create'
 import { deleteEndCardElements } from '../lib/endcards/delete';
-import { createLayout1, createLayout2 } from '../lib/endcards/layout';
+import { createLayout1, createLayout2, createLayout3 } from '../lib/endcards/layout';
 import { updateEndScreenItem, EndScreenItemUpdateProps, createEndScreenArchiveIfNotExists, checkIsEndScreenItemMarkedAsCancelled, checkIsEndScreenCampaignMarkedAsCancelled } from '../lib/api';
 import { createEndScreenArchive } from '../lib/endcards/archive';
 
@@ -25,6 +25,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
     let _endScreenCampaignIsCancelled
 
+
     for (let endScreenCampaignItemIndex = 0; endScreenCampaignItemIndex < action.actionProps.endScreenCampaignItems.length; endScreenCampaignItemIndex++) {
 
         if (_endScreenCampaignIsCancelled) {
@@ -38,6 +39,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
         let _hasFailed = false
         let _endCardLayoutApplied: string | null = null
+
 
 
         try {
@@ -123,11 +125,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
             await deleteEndCardElements(page)
 
-
-
-
-
-            await createCards(page, {
+            const { createdSecondaryCard } = await createCards(page, {
                 primaryCardURL,
                 primaryCard: true,
                 bestForViewerCard: true,
@@ -136,14 +134,17 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                 secondaryCardURL: secondaryCardURL
             })
 
-            await createLayout1(page)
-
+            if (createdSecondaryCard) {
+                await createLayout3(page)
+                _endCardLayoutApplied = 'layout_3b'
+            } else {
+                await createLayout1(page)
+                _endCardLayoutApplied = 'layout_1b'
+            }
 
 
             const isSaveBtnDisabledFromLayout1 = await checkIsSaveButtonDisabled(page)
 
-
-            let _usedLayout2 = false
             if (isSaveBtnDisabledFromLayout1) {
                 // reset and create layout 2
                 logEndScreenAction(`Save disabled. Attempt creating layout 2 for video ${targetVideoId}`)
@@ -161,10 +162,9 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
                 await createLayout2(page)
 
-                _usedLayout2 = true
+                _endCardLayoutApplied = 'layout_2b'
             }
 
-            _endCardLayoutApplied = _usedLayout2 ? 'layout_2' : "layout_1a"
 
 
             const isSaveBtnDisabledFromAllLayouts = await checkIsSaveButtonDisabled(page)

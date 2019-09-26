@@ -15,10 +15,14 @@ export interface CreateCardOptions {
 export const createCards = async (page: puppeteer.Page, { primaryCardURL, primaryCard = false,
     bestForViewerCard = false, subscribeCard = false,
     secondaryCard = false, secondaryCardURL
-}: CreateCardOptions) => {
+}: CreateCardOptions): Promise<{
+    createdSecondaryCard: boolean
+}> => {
 
     let inputs
     let createBtns
+
+    let _createdSecondaryCard = false
 
     if (primaryCard) {
 
@@ -84,27 +88,39 @@ export const createCards = async (page: puppeteer.Page, { primaryCardURL, primar
 
 
 
-    if (secondaryCard) {
+    try {
 
-        // create specific video url end screen screen
-        logEndScreenAction('Create secondary card element: secondaryCardURL - Processing...')
-        await page.waitForSelector('#endscreen-editor-add-element')
-        await page.click('#endscreen-editor-add-element')
-        await page.waitFor(2 * 1000)
-        await page.waitForSelector('.annotator-create-button')
-        await page.click('.annotator-create-button')
-        await page.waitForSelector('#annotator-video-type-fixed')
-        await page.click('#annotator-video-type-fixed')
-        await page.waitForSelector('#annotator-video-type-fixed')
-        await page.click('#annotator-video-type-fixed')
-        await page.waitFor(2 * 1000)
-        inputs = await page.$$(INPUT_VIDEO_URL_SELECTOR)
-        await inputs[1].type(`${secondaryCardURL}`)
-        await inputs[1].type(String.fromCharCode(13))
-        logEndScreenAction('Create secondary card element: Complete')
 
-        await page.waitFor(5 * 1000)
+        if (secondaryCard) {
+
+            // create specific video url end screen screen
+            logEndScreenAction('Create secondary card element: secondaryCardURL - Processing...')
+            await page.waitForSelector('#endscreen-editor-add-element', { timeout: 5 * 1000 })
+            await page.click('#endscreen-editor-add-element')
+            await page.waitFor(2 * 1000)
+            await page.waitForSelector('.annotator-create-button')
+            await page.click('.annotator-create-button')
+            await page.waitForSelector('#annotator-video-type-fixed')
+            await page.click('#annotator-video-type-fixed')
+            await page.waitForSelector('#annotator-video-type-fixed')
+            await page.click('#annotator-video-type-fixed')
+            await page.waitFor(2 * 1000)
+            inputs = await page.$$(INPUT_VIDEO_URL_SELECTOR)
+            await inputs[1].type(`${secondaryCardURL}`)
+            await inputs[1].type(String.fromCharCode(13))
+            logEndScreenAction('Create secondary card element: Complete')
+
+            await page.waitFor(5 * 1000)
+            _createdSecondaryCard = true
+        }
+    } catch (err) {
+        console.error("Failed to create secondary card. Skipping...")
     }
+
+    return {
+        createdSecondaryCard: _createdSecondaryCard
+    }
+
 
 
 }
