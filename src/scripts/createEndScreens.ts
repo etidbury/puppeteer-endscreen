@@ -54,6 +54,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                 hasExecuted: false
             })
 
+            console.log('>>>>>>updateEndScreenCampaignItem', updateEndScreenCampaignItem)
             _lastEndScreenCampaignItem = updateEndScreenCampaignItem
 
 
