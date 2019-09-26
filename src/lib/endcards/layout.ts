@@ -282,13 +282,13 @@ export const createLayout2 = async (page: puppeteer.Page) => {
             //     //moveToY=endScreenSafeArea.y+10
             //     moveToY = endScreenSafeArea.y + (endScreenSafeArea.height/2 - height/2)
             // break;
-            case 0: // custom video url
+            case 1: // custom video url
 
                 moveToX = endScreenSafeArea.x + endScreenSafeArea.width - width - 10 // 544-245-10
                 moveToY = endScreenSafeArea.y + (endScreenSafeArea.height / 2 - height / 2)
 
                 break
-            case 1: // best for viewer
+            case 0: // best for viewer
                 moveToX = endScreenSafeArea.x + 10
                 moveToY = endScreenSafeArea.y + (endScreenSafeArea.height / 2 - height / 2)
                 // await addPageMarker(page,moveToX,moveToY,'red')
