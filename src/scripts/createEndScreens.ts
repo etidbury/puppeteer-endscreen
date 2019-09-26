@@ -197,6 +197,11 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                     hasExecuted: true
                 }
 
+                if (_hasFailed) {
+                    updateProps.failedAttempts = (_lastEndScreenCampaignItem.failedAttempts || 0) + 1
+                    logEndScreenAction(`Failed attempts: ${updateProps.failedAttempts}`)
+                }
+
                 if (_endCardLayoutApplied) {
                     updateProps.endCardLayoutApplied = _endCardLayoutApplied
                 }

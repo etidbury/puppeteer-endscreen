@@ -7,4 +7,5 @@ export interface ScriptArgs {
 export interface EndScreenItem {
     id: string
     youtubeVideoId: string
+    failedAttempts: number | undefined
 }

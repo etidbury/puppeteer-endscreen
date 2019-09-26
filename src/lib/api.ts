@@ -51,6 +51,7 @@ export interface EndScreenItemUpdateProps {
     isCancelled?: boolean,
     endCardLayoutApplied?: string
     lastStatusUpdate?: Date
+    failedAttempts?: number
 }
 
 
@@ -66,8 +67,8 @@ export const checkIsEndScreenItemMarkedAsCancelled = async (endScreenCampaignIte
                 }
         }
         `, {
-            endScreenCampaignItemId: endScreenCampaignItem.id
-        })
+        endScreenCampaignItemId: endScreenCampaignItem.id
+    })
 
     console.debug('checkIsEndScreenItemMarkedAsCancelled()', result, result.endScreenCampaignItem.isCancelled)
 
@@ -90,8 +91,8 @@ export const checkIsEndScreenCampaignMarkedAsCancelled = async (endScreenCampaig
                 }
         }
         `, {
-            endScreenCampaignId: endScreenCampaignId
-        })
+        endScreenCampaignId: endScreenCampaignId
+    })
 
     console.debug('checkIsEndScreenCampaignMarkedAsCancelled()', result, result.endScreenCampaign.isCancelled)
 
@@ -114,12 +115,13 @@ export const updateEndScreenItem = async (endScreenCampaignItem: EndScreenItem, 
                         hasFailed,
                         isCancelled,
                         lastStatusUpdate
+                        failedAttempts
                     }
                 }
         `, {
-            endScreenCampaignItemId: endScreenCampaignItem.id,
-            data: Object.assign(updateProps, { lastStatusUpdate: updateProps.lastStatusUpdate.toISOString() })
-        })
+        endScreenCampaignItemId: endScreenCampaignItem.id,
+        data: Object.assign(updateProps, { lastStatusUpdate: updateProps.lastStatusUpdate.toISOString() })
+    })
 
 }
 
@@ -137,17 +139,17 @@ export const createEndScreenArchiveIfNotExists = async (endScreenCampaignItem: E
             }
         }
         `, {
-            "create": {
-                "youtubeVideoId": endScreenCampaignItem.youtubeVideoId,
-                "previousEndScreenProps": archiveProps
-            },
-            "update": {
-                "youtubeVideoId": endScreenCampaignItem.youtubeVideoId
-            }
-            ,
-            "where": {
-                "youtubeVideoId": endScreenCampaignItem.youtubeVideoId
-            }
-        })
+        "create": {
+            "youtubeVideoId": endScreenCampaignItem.youtubeVideoId,
+            "previousEndScreenProps": archiveProps
+        },
+        "update": {
+            "youtubeVideoId": endScreenCampaignItem.youtubeVideoId
+        }
+        ,
+        "where": {
+            "youtubeVideoId": endScreenCampaignItem.youtubeVideoId
+        }
+    })
 
 }
