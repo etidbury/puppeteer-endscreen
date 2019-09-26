@@ -150,7 +150,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
 
 
-            const alertErrorElement = await page.$('yt-alert-content')
+            const alertErrorElement = await page.$('.yt-alert-content')
 
             console.log('alerterrorelement', alertErrorElement)
             const hasExceededMaxNumElements = await page.evaluate(
