@@ -47,12 +47,14 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
             const endScreenCampaignItem: EndScreenItem = action.actionProps.endScreenCampaignItems[endScreenCampaignItemIndex] as EndScreenItem
 
-            _lastEndScreenCampaignItem = await updateEndScreenItem(endScreenCampaignItem, {
+            const { updateEndScreenCampaignItem } = await updateEndScreenItem(endScreenCampaignItem, {
                 isQueued: false,
                 isProcessing: true,
                 //hasFailed: false,
                 hasExecuted: false
             })
+
+            _lastEndScreenCampaignItem = updateEndScreenCampaignItem
 
 
 
