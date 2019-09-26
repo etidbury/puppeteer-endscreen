@@ -52,6 +52,7 @@ export interface EndScreenItemUpdateProps {
     endCardLayoutApplied?: string
     lastStatusUpdate?: Date
     failedAttempts?: number
+    isProcessing?: boolean
 }
 
 

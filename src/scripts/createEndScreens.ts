@@ -48,6 +48,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
             _lastEndScreenCampaignItem = endScreenCampaignItem
             await updateEndScreenItem(endScreenCampaignItem, {
                 isQueued: false,
+                isProcessing: true,
                 hasFailed: false,
                 hasExecuted: false
             })
@@ -194,7 +195,8 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                     isCancelled: _lastEndScreenCampaignItemCancelled,
                     isQueued: false,
                     hasFailed: _hasFailed,
-                    hasExecuted: true
+                    hasExecuted: true,
+                    isProcessing: false
                 }
 
                 if (_hasFailed) {
