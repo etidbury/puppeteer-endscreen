@@ -206,6 +206,10 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                     updateProps.endCardLayoutApplied = _endCardLayoutApplied
                 }
 
+                if (_endScreenCampaignIsCancelled) {
+                    updateProps.isCancelled = true
+                }
+
                 await updateEndScreenItem(_lastEndScreenCampaignItem, updateProps)
 
                 _lastEndScreenCampaignItem = null
