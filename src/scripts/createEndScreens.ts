@@ -131,17 +131,22 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
             let _hasFailedToCreateInitialCards = false
 
-            const { createdSecondaryCard } = await createCards(page, {
-                primaryCardURL,
-                primaryCard: true,
-                bestForViewerCard: true,
-                subscribeCard: true,
-                secondaryCard: !!secondaryCardURL && secondaryCardURL.length > 0,
-                secondaryCardURL: secondaryCardURL
-            }).catch(() => {
+            let _createdSecondaryCard = false
+
+            try {
+                const { createdSecondaryCard } = await createCards(page, {
+                    primaryCardURL,
+                    primaryCard: true,
+                    bestForViewerCard: true,
+                    subscribeCard: true,
+                    secondaryCard: !!secondaryCardURL && secondaryCardURL.length > 0,
+                    secondaryCardURL: secondaryCardURL
+                })
+                _createdSecondaryCard = createdSecondaryCard
+            } catch (err) {
                 _hasFailedToCreateInitialCards = true
-                return { createdSecondaryCard: false }
-            })
+            }
+
 
 
 
@@ -160,7 +165,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
             if (!_hasFailedToCreateInitialCards) {
 
-                if (createdSecondaryCard) {
+                if (_createdSecondaryCard) {
                     await createLayout3(page)
                     _endCardLayoutApplied = 'layout_3b'
                 } else {
