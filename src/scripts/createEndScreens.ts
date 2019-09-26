@@ -129,7 +129,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
             await deleteEndCardElements(page)
 
-            let _failedToCreateInitialCards = false
+            let _hasFailedToCreateInitialCards = false
 
             const { createdSecondaryCard } = await createCards(page, {
                 primaryCardURL,
@@ -139,11 +139,26 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                 secondaryCard: !!secondaryCardURL && secondaryCardURL.length > 0,
                 secondaryCardURL: secondaryCardURL
             }).catch(() => {
-                _failedToCreateInitialCards = true
+                _hasFailedToCreateInitialCards = true
                 return { createdSecondaryCard: false }
             })
 
-            if (!_failedToCreateInitialCards) {
+
+
+            const alertErrorElement = await page.$('yt-alert-content')
+
+            const hasExceededMaxNumElements = await page.evaluate(
+                (alertErrorElement) => {
+                    return alertErrorElement && alertErrorElement.innerHTML && alertErrorElement.innerHTML.indexOf("exceeded") > -1
+                }
+                , alertErrorElement)
+
+            if (hasExceededMaxNumElements) {
+                logEndScreenAction("Has found error message specifying exceeded max number of elements")
+                _hasFailedToCreateInitialCards = true
+            }
+
+            if (!_hasFailedToCreateInitialCards) {
 
                 if (createdSecondaryCard) {
                     await createLayout3(page)
@@ -154,22 +169,17 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                 }
             }
 
-
-
-            if (_failedToCreateInitialCards) {
+            if (_hasFailedToCreateInitialCards) {
 
                 logEndScreenAction("Closing select element overlay")
                 await page.click('.yt-uix-overlay-close')
                 await page.waitFor(1000)
 
-
             }
-
 
             const isSaveBtnDisabledFromLayout1 = await checkIsSaveButtonDisabled(page)
 
-
-            if (isSaveBtnDisabledFromLayout1 || _failedToCreateInitialCards) {
+            if (isSaveBtnDisabledFromLayout1 || _hasFailedToCreateInitialCards) {
                 // reset and create layout 2
                 logEndScreenAction(`Save disabled. Attempt creating layout 2 for video ${targetVideoId}`)
                 await deleteEndCardElements(page)
