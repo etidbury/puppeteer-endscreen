@@ -174,8 +174,14 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
                 logEndScreenAction("Closing select element overlay")
 
-                const saveBtnElement = await page.$('.yt-uix-overlay-close')[0]
-                await saveBtnElement.click()
+                await page.evaluate(
+                    (btnCloseOverlaySelector) => {
+                        const el = document.getElementsByClassName(btnCloseOverlaySelector)[0]
+
+                        //@ts-ignore
+                        el.click()
+                    }
+                    , '.yt-uix-overlay-close')
 
                 await page.waitFor(1000)
 
