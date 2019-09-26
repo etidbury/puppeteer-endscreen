@@ -47,13 +47,14 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
             const endScreenCampaignItem: EndScreenItem = action.actionProps.endScreenCampaignItems[endScreenCampaignItemIndex] as EndScreenItem
 
-            _lastEndScreenCampaignItem = endScreenCampaignItem
-            await updateEndScreenItem(endScreenCampaignItem, {
+            _lastEndScreenCampaignItem = await updateEndScreenItem(endScreenCampaignItem, {
                 isQueued: false,
                 isProcessing: true,
                 //hasFailed: false,
                 hasExecuted: false
             })
+
+
 
 
             const endScreenItemIsCancelled = await checkIsEndScreenItemMarkedAsCancelled(endScreenCampaignItem)
