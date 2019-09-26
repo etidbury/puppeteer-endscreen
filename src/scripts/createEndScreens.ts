@@ -51,7 +51,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
             await updateEndScreenItem(endScreenCampaignItem, {
                 isQueued: false,
                 isProcessing: true,
-                hasFailed: false,
+                //hasFailed: false,
                 hasExecuted: false
             })
 
@@ -200,6 +200,8 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                 }
 
                 if (_hasFailed) {
+                    console.log('_lastEndScreenCampaignItem.failedAttempts', _lastEndScreenCampaignItem
+                        , typeof _lastEndScreenCampaignItem.failedAttempts, _lastEndScreenCampaignItem.failedAttempts)
                     updateProps.failedAttempts = (_lastEndScreenCampaignItem.failedAttempts || 0) + 1
                     logEndScreenAction(`Failed attempts: ${updateProps.failedAttempts}`)
                 } else {
