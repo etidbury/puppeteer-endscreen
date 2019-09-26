@@ -111,6 +111,8 @@ export const updateEndScreenItem = async (endScreenCampaignItem: EndScreenItem, 
                 updateEndScreenCampaignItem(data:$data,where:{
                     id:$endScreenCampaignItemId
                 }) {
+                        id
+                        youtubeVideoId
                         isQueued,
                         hasExecuted,
                         hasFailed,
