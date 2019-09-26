@@ -129,6 +129,8 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
             await deleteEndCardElements(page)
 
+            let _failedToCreateInitialCards = false
+
             const { createdSecondaryCard } = await createCards(page, {
                 primaryCardURL,
                 primaryCard: true,
@@ -136,20 +138,38 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                 subscribeCard: true,
                 secondaryCard: !!secondaryCardURL && secondaryCardURL.length > 0,
                 secondaryCardURL: secondaryCardURL
+            }).catch(() => {
+                _failedToCreateInitialCards = true
+                return { createdSecondaryCard: false }
             })
 
-            if (createdSecondaryCard) {
-                await createLayout3(page)
-                _endCardLayoutApplied = 'layout_3b'
-            } else {
-                await createLayout1(page)
-                _endCardLayoutApplied = 'layout_1b'
+            if (!_failedToCreateInitialCards) {
+
+                if (createdSecondaryCard) {
+                    await createLayout3(page)
+                    _endCardLayoutApplied = 'layout_3b'
+                } else {
+                    await createLayout1(page)
+                    _endCardLayoutApplied = 'layout_1b'
+                }
+            }
+
+
+
+            if (_failedToCreateInitialCards) {
+
+                logEndScreenAction("Closing select element overlay")
+                await page.click('.yt-uix-overlay-close')
+                await page.waitFor(1000)
+
+
             }
 
 
             const isSaveBtnDisabledFromLayout1 = await checkIsSaveButtonDisabled(page)
 
-            if (isSaveBtnDisabledFromLayout1) {
+
+            if (isSaveBtnDisabledFromLayout1 || _failedToCreateInitialCards) {
                 // reset and create layout 2
                 logEndScreenAction(`Save disabled. Attempt creating layout 2 for video ${targetVideoId}`)
                 await deleteEndCardElements(page)
