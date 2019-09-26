@@ -202,11 +202,12 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                 if (_hasFailed) {
                     updateProps.failedAttempts = (_lastEndScreenCampaignItem.failedAttempts || 0) + 1
                     logEndScreenAction(`Failed attempts: ${updateProps.failedAttempts}`)
+                } else {
+                    if (_endCardLayoutApplied) {
+                        updateProps.endCardLayoutApplied = _endCardLayoutApplied
+                    }
                 }
 
-                if (_endCardLayoutApplied) {
-                    updateProps.endCardLayoutApplied = _endCardLayoutApplied
-                }
 
                 if (_endScreenCampaignIsCancelled) {
                     updateProps.isCancelled = true
