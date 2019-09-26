@@ -138,7 +138,7 @@ export const createLayout3 = async (page: puppeteer.Page) => {
         throw new Error('Failed to find endScreenSafeArea')
     }
 
-    logEndScreenAction('Move End Card elements: Processing layout 1...')
+    logEndScreenAction('Move End Card elements: Processing layout 3...')
 
     for (let i = 0; i < editableElements.length; i++) {
 
