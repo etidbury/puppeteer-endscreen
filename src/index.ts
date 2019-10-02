@@ -12,6 +12,7 @@ import { loadAction, saveTestAction } from './lib/action';
 import loginViaGoogle from './scripts/loginViaGoogle';
 import createEndScreens from './scripts/createEndScreens';
 import { createTestEndScreenCampaignAndAction } from './mock';
+import { checkIsEndScreenCampaignMarkedAsCancelled } from './lib/api';
 
 
 
@@ -95,6 +96,15 @@ const init = async () => {
         console.debug('Running scripts...')
 
         const action = await loadAction()
+
+        const isEndScreenCampaignCancelled = await checkIsEndScreenCampaignMarkedAsCancelled(action.actionProps.endScreenCampaignId)
+
+        if (isEndScreenCampaignCancelled) {
+            console.log('End screen was cancelled. Exiting with code 0')
+            process.exit(0)
+            return
+        }
+
 
         await loginViaGoogle({ browser, page }, action)
         await createEndScreens({ browser, page }, action)
