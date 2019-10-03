@@ -3,6 +3,8 @@ import { logEndScreenAction } from "../logs";
 
 import puppeteer from 'puppeteer'
 
+const PADDING = 3
+
 const _moveEditableElement = async (page, editableElement, moveToX, moveToY) => {
 
     const { x, y, width, height } = await editableElement.boundingBox()
@@ -58,18 +60,21 @@ export const createLayout1 = async (page: puppeteer.Page) => {
         let moveToX = 0
         let moveToY = 0
 
+
+
+
         switch (i) {
             case 0: // sub button
-                moveToX = endScreenSafeArea.x
-                moveToY = endScreenSafeArea.y + 10
+                moveToX = endScreenSafeArea.x + PADDING
+                moveToY = endScreenSafeArea.y + PADDING
                 break
             case 1: // best for viewer
-                moveToX = endScreenSafeArea.x
-                moveToY = endScreenSafeArea.y + endScreenSafeArea.height - height - 10
+                moveToX = endScreenSafeArea.x + PADDING
+                moveToY = endScreenSafeArea.y + endScreenSafeArea.height - height - PADDING
                 break
-            case 2: // custom link
-                moveToX = endScreenSafeArea.x + endScreenSafeArea.width - width - 10
-                moveToY = endScreenSafeArea.y + (endScreenSafeArea.height / 2 - height / 2)
+            case 2: // primary card
+                moveToX = endScreenSafeArea.x + endScreenSafeArea.width - width - PADDING
+                moveToY = endScreenSafeArea.y + (endScreenSafeArea.height / 2 - height / 2) - PADDING
                 break
             default:
                 throw new Error(`Move coordinates not set for editable element ${i}`)
@@ -111,7 +116,7 @@ export const createLayout1 = async (page: puppeteer.Page) => {
     const { height: subscribeEndCardHeight, width: subscribeEndCardWidth } = firstEditableElementBoundingBox
 
     const scaleToX = endScreenSafeArea.x + 5
-    const scaleToY = endScreenSafeArea.y + subscribeEndCardHeight + 5
+    const scaleToY = endScreenSafeArea.y + endScreenSafeArea.height //smallest size
     // document.querySelectorAll('.editable-element-dragger.top-right')
     await _moveEditableElement(page, bestForViewerCardTopRightDragger, scaleToX, scaleToY)
 
@@ -158,12 +163,12 @@ export const createLayout3 = async (page: puppeteer.Page) => {
 
         switch (i) {
             case 0: // sub button
-                moveToX = endScreenSafeArea.x
-                moveToY = endScreenSafeArea.y
+                moveToX = endScreenSafeArea.x + PADDING
+                moveToY = endScreenSafeArea.y + PADDING
                 break
             case 2: // best for viewer
-                moveToX = endScreenSafeArea.x
-                moveToY = endScreenSafeArea.y + endScreenSafeArea.height - height
+                moveToX = endScreenSafeArea.x + PADDING
+                moveToY = endScreenSafeArea.y + endScreenSafeArea.height - height - PADDING
                 break
             case 3: // primary
 
@@ -173,8 +178,8 @@ export const createLayout3 = async (page: puppeteer.Page) => {
                 /*------/middle-right------*/
 
                 /*----top right----*/
-                moveToX = endScreenSafeArea.x + endScreenSafeArea.width - width
-                moveToY = endScreenSafeArea.y
+                moveToX = endScreenSafeArea.x + endScreenSafeArea.width - width - PADDING
+                moveToY = endScreenSafeArea.y - PADDING
                 /*-----------------*/
 
                 break
@@ -187,8 +192,8 @@ export const createLayout3 = async (page: puppeteer.Page) => {
                 /*------/middle-right------*/
 
                 /*----bottom right----*/
-                moveToX = endScreenSafeArea.x + endScreenSafeArea.width - width
-                moveToY = endScreenSafeArea.y + endScreenSafeArea.height - height
+                moveToX = endScreenSafeArea.x + endScreenSafeArea.width - width - PADDING
+                moveToY = endScreenSafeArea.y + endScreenSafeArea.height - height - PADDING
                 /*-----------------*/
 
                 break
@@ -230,8 +235,8 @@ export const createLayout3 = async (page: puppeteer.Page) => {
     }
     const { height: subscribeEndCardHeight, width: subscribeEndCardWidth } = firstEditableElementBoundingBox
 
-    const scaleToX = endScreenSafeArea.x + 5
-    const scaleToY = endScreenSafeArea.y + subscribeEndCardHeight + 5
+    const scaleToX = endScreenSafeArea.x + PADDING
+    const scaleToY = endScreenSafeArea.y + subscribeEndCardHeight + PADDING
     // document.querySelectorAll('.editable-element-dragger.top-right')
     await _moveEditableElement(page, bestForViewerCardTopRightDragger, scaleToX, scaleToY)
 
@@ -284,12 +289,12 @@ export const createLayout2 = async (page: puppeteer.Page) => {
             // break;
             case 1: // custom video url
 
-                moveToX = endScreenSafeArea.x + endScreenSafeArea.width - width - 10 // 544-245-10
+                moveToX = endScreenSafeArea.x + endScreenSafeArea.width - width - PADDING // 544-245-10
                 moveToY = endScreenSafeArea.y + (endScreenSafeArea.height / 2 - height / 2)
 
                 break
             case 0: // best for viewer
-                moveToX = endScreenSafeArea.x + 10
+                moveToX = endScreenSafeArea.x + PADDING
                 moveToY = endScreenSafeArea.y + (endScreenSafeArea.height / 2 - height / 2)
                 // await addPageMarker(page,moveToX,moveToY,'red')
                 break

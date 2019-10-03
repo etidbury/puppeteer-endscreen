@@ -143,16 +143,28 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                     secondaryCardURL: secondaryCardURL
                 })
                 _createdSecondaryCard = createdSecondaryCard
+
             } catch (err) {
+                console.log('err', err)
                 _hasFailedToCreateInitialCards = true
             }
 
-
-
-
             const alertErrorElement = await page.$('.yt-alert-content')
 
+            // const alertErrorElements = await page.evaluate(
+            //     () => {
+
+            //         const el = document.querySelector('.yt-alert-content')
+
+
+            //         console.log('el', el)
+
+            //         return el
+            //     }
+            // )
+
             const hasExceededMaxNumElements = !!alertErrorElement
+            //const hasExceededMaxNumElements = false
 
             if (hasExceededMaxNumElements) {
                 logEndScreenAction("Has found error message specifying exceeded max number of elements")
@@ -188,29 +200,48 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
             }
 
-            const isSaveBtnDisabledFromLayout1 = await checkIsSaveButtonDisabled(page)
 
-            if (isSaveBtnDisabledFromLayout1 || _hasFailedToCreateInitialCards) {
-                // reset and create layout 2
-                logEndScreenAction(`Save disabled. Attempt creating layout 2 for video ${targetVideoId}`)
-                await deleteEndCardElements(page)
 
-                await createCards(page, {
-                    primaryCardURL,
-                    primaryCard: true,
-                    bestForViewerCard: true,
-                    subscribeCard: false, //dont add subscribe button,
-                    secondaryCard: false
-                })
 
-                await page.waitFor(5 * 1000)
+            if (_hasFailedToCreateInitialCards) {
 
-                await createLayout2(page)
+                logEndScreenAction('Failed to create all initial cards.')
 
-                _endCardLayoutApplied = 'layout_2b'
+                logEndScreenAction(`Attempt creating layout 1 for video ${targetVideoId}`)
+
+                // if (_createdSecondaryCard) {
+                //     await createLayout3(page)
+                //     _endCardLayoutApplied = 'layout_3b'
+                // } else {
+                await createLayout1(page)
+                _endCardLayoutApplied = 'layout_1b'
+
+
+                const isSaveBtnDisabledFromLayout1 = await checkIsSaveButtonDisabled(page)
+
+
+                if (isSaveBtnDisabledFromLayout1) {
+
+
+                    // reset and create layout 2
+                    logEndScreenAction(`Save disabled. Attempt creating layout 2 for video ${targetVideoId}`)
+                    await deleteEndCardElements(page)
+
+                    await createCards(page, {
+                        primaryCardURL,
+                        primaryCard: true,
+                        bestForViewerCard: true,
+                        subscribeCard: false, //dont add subscribe button,
+                        secondaryCard: false
+                    })
+
+                    await page.waitFor(5 * 1000)
+
+                    await createLayout2(page)
+
+                    _endCardLayoutApplied = 'layout_2b'
+                }
             }
-
-
 
             const isSaveBtnDisabledFromAllLayouts = await checkIsSaveButtonDisabled(page)
 
@@ -218,9 +249,6 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                 logEndScreenAction('Save button still disabled')
                 throw new Error(`Failed to create a layout suitable for video ${targetVideoId}`)
             }
-
-
-
 
             logEndScreenAction('Clicking save')
 
