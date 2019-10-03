@@ -32,6 +32,11 @@ export const createLayout1 = async (page: puppeteer.Page) => {
     const editableElements = await page.$$(EDITABLE_ELEMENT_SELECTOR)
     const playerGridSafeArea = await page.$(ENDCARD_SAFE_AREA_SELECTOR)
 
+    const subscribeBtnBoundingBox = await editableElements[0].boundingBox()
+    //@ts-ignore
+    const { x: subscribeBtnBoundingBoxX, y: subscribeBtnBoundingBoxY, width: subscribeBtnBoundingBoxWidth, height: subscribeBtnBoundingBoxHeight } = subscribeBtnBoundingBox
+
+
     if (!playerGridSafeArea) {
         throw new Error('Failed to find playerGridSafeArea')
     }
@@ -47,6 +52,7 @@ export const createLayout1 = async (page: puppeteer.Page) => {
     for (let i = 0; i < editableElements.length; i++) {
 
 
+
         const boundingBox = await editableElements[i].boundingBox()
 
         if (!boundingBox) {
@@ -55,13 +61,11 @@ export const createLayout1 = async (page: puppeteer.Page) => {
 
         const { x, y, width, height } = boundingBox
 
+
         // const moveToX = endScreenSafeArea.x+endScreenSafeArea.width
 
         let moveToX = 0
         let moveToY = 0
-
-
-
 
         switch (i) {
             case 0: // sub button
@@ -70,7 +74,7 @@ export const createLayout1 = async (page: puppeteer.Page) => {
                 break
             case 1: // best for viewer
                 moveToX = endScreenSafeArea.x + PADDING
-                moveToY = endScreenSafeArea.y + endScreenSafeArea.height - height - PADDING
+                moveToY = endScreenSafeArea.y + subscribeBtnBoundingBoxHeight + 50 + PADDING
                 break
             case 2: // primary card
                 moveToX = endScreenSafeArea.x + endScreenSafeArea.width - width - PADDING
