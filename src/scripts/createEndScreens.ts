@@ -40,8 +40,6 @@ export default async ({ page }: ScriptArgs, action: Action) => {
         let _hasFailed = false
         let _endCardLayoutApplied: string | null = null
 
-
-
         try {
 
 
@@ -243,6 +241,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                 }
             }
 
+
             const isSaveBtnDisabledFromAllLayouts = await checkIsSaveButtonDisabled(page)
 
             if (isSaveBtnDisabledFromAllLayouts) {
@@ -254,8 +253,58 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
             await page.click(BTN_SAVE_SELECTOR)
 
+
+
+
             await interceptWaitForNetworkIdle(page, 5 * 1000)
 
+
+            const annotationStatusError = await page.evaluate(
+                () => {
+                    const el = document.querySelector('.annotator-status-save') as any
+
+                    return el && el.innerHTML
+                }
+            )
+
+            if (annotationStatusError && annotationStatusError.length) {
+
+                logEndScreenAction(`Status error from YT: '${annotationStatusError}'`)
+
+                // reset and create layout 2
+                logEndScreenAction(`Attempt creating layout 2 for video ${targetVideoId}`)
+                await deleteEndCardElements(page)
+
+                await createCards(page, {
+                    primaryCardURL,
+                    primaryCard: true,
+                    bestForViewerCard: true,
+                    subscribeCard: false, //dont add subscribe button,
+                    secondaryCard: false
+                })
+
+                await page.waitFor(5 * 1000)
+
+                await createLayout2(page)
+
+                _endCardLayoutApplied = 'layout_2b'
+
+
+                const isSaveBtnDisabledFromAllLayouts = await checkIsSaveButtonDisabled(page)
+
+                if (isSaveBtnDisabledFromAllLayouts) {
+                    logEndScreenAction('Save button still disabled')
+                    throw new Error(`Failed to create a layout suitable for video ${targetVideoId}`)
+                }
+
+
+                logEndScreenAction('Re-clicking save')
+
+                await page.click(BTN_SAVE_SELECTOR)
+
+
+                //throw new Error(`Status error from YT: '${annotationStatusError}'`)
+            }
 
         } catch (err) {
             console.error('Error occurred', err)
