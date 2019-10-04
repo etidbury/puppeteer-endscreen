@@ -67,24 +67,41 @@ export const createLayout1 = async (page: puppeteer.Page) => {
         let moveToX = 0
         let moveToY = 0
 
+        // switch (i) {
+        //     case 0: // sub button
+        //         moveToX = endScreenSafeArea.x + PADDING
+        //         moveToY = endScreenSafeArea.y + PADDING
+        //         break
+        //     case 1: // best for viewer
+        //         moveToX = endScreenSafeArea.x + PADDING
+        //         moveToY = endScreenSafeArea.y + subscribeBtnBoundingBoxHeight + 50 + PADDING
+        //         break
+        //     case 2: // primary card
+        //         moveToX = endScreenSafeArea.x + endScreenSafeArea.width - width - PADDING
+        //         moveToY = endScreenSafeArea.y + (endScreenSafeArea.height / 2 - height / 2) - PADDING
+        //         break
+        //     default:
+        //         throw new Error(`Move coordinates not set for editable element ${i}`)
+
+        // }
+
         switch (i) {
             case 0: // sub button
-                moveToX = endScreenSafeArea.x + PADDING
-                moveToY = endScreenSafeArea.y + PADDING
+                moveToX = endScreenSafeArea.x
+                moveToY = endScreenSafeArea.y + 10
                 break
             case 1: // best for viewer
-                moveToX = endScreenSafeArea.x + PADDING
-                moveToY = endScreenSafeArea.y + subscribeBtnBoundingBoxHeight + 50 + PADDING
+                moveToX = endScreenSafeArea.x
+                moveToY = endScreenSafeArea.y + endScreenSafeArea.height - height - 10
                 break
-            case 2: // primary card
-                moveToX = endScreenSafeArea.x + endScreenSafeArea.width - width - PADDING
-                moveToY = endScreenSafeArea.y + (endScreenSafeArea.height / 2 - height / 2) - PADDING
+            case 2: // custom link
+                moveToX = endScreenSafeArea.x + endScreenSafeArea.width - width - 10
+                moveToY = endScreenSafeArea.y + (endScreenSafeArea.height / 2 - height / 2)
                 break
             default:
                 throw new Error(`Move coordinates not set for editable element ${i}`)
-
+                break
         }
-
 
         // console.log('move element',i,{moveToX,moveToY})
 
