@@ -267,7 +267,9 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                 }
             )
 
-            if (annotationStatusError && annotationStatusError.length) {
+            console.log('sss', annotationStatusError.toLowerCase().indexOf('all changes saved'))
+            if (annotationStatusError && annotationStatusError.length &&
+                annotationStatusError.toLowerCase().indexOf('all changes saved') <= -1) {
 
                 logEndScreenAction(`Status error from YT: '${annotationStatusError}'`)
 
