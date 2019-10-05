@@ -145,12 +145,19 @@ const _triggerEnableEndCardSaving = async (page: puppeteer.Page) => {
 export const createEndScreenArchive = async (page: puppeteer.Page, endScreenCampaignItem: EndScreenItem) => {
 
 
+    try {
 
-    await _triggerEnableEndCardSaving(page)
 
-    await _interceptEndCardSave(page, endScreenCampaignItem)
 
-    logEndScreenAction('Finished archiving')
-    await page.waitFor(2 * 1000)
+        await _triggerEnableEndCardSaving(page)
+
+        await _interceptEndCardSave(page, endScreenCampaignItem)
+
+        logEndScreenAction('Finished archiving')
+        await page.waitFor(2 * 1000)
+
+    } catch (err) {
+        console.warn("Failed to archive end card")
+    }
 
 }
