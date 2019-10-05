@@ -135,7 +135,7 @@ const _triggerEnableEndCardSaving = async (page: puppeteer.Page) => {
 
 
     } else {
-        throw new Error('Failed to find any editable elements')
+        console.warn("No editable elements to archive.")
     }
 
 
