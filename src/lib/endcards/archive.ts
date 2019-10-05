@@ -33,7 +33,7 @@ const _interceptEndCardSave = async (page: puppeteer.Page, endScreenCampaignItem
                 return
             }
             _reject(new Error('_interceptEndCardSave(): timeout'))
-        }, 30 * 1000)
+        }, 20 * 1000)
 
 
         const onReq = async interceptedRequest => {
