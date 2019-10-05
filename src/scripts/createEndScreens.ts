@@ -123,7 +123,14 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
             }
 
-            await createEndScreenArchive(page, endScreenCampaignItem)
+            try {
+
+
+                await createEndScreenArchive(page, endScreenCampaignItem)
+
+            } catch (err) {
+                console.warn("Failed to store archive. Ignoring...")
+            }
 
             await deleteEndCardElements(page)
 
