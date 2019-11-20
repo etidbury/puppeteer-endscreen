@@ -89,6 +89,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
             if (secondaryCardURL && secondaryCardURL.length && secondaryCardURL.trim().toLowerCase() === "auto") {
 
+                logEndScreenAction(`Looking up DAP from API: ${targetVideoId}`)
                 try {
 
                     const dynamicArtistPlaylistId = await getDynamicArtistPlaylistIdByVideoId(targetVideoId)
