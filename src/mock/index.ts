@@ -36,7 +36,7 @@ export const createTestEndScreenCampaignAndAction = async () => {
         `, {
             data: {
                 primaryCardURL: "https://www.youtube.com/watch?v=chSZCtLrgz8",
-                secondaryCardURL: "https://www.youtube.com/playlist?list=TLGGtMlvWHrKn5gxMDExMjAxOQ",
+                secondaryCardURL: "https://www.youtube.com/watch?v=lp-EO5I60KA&list=RDEM_Ktu-TilkxtLvmc9wX1MLQ&start_radio=1",
 
                 notes: "testcampaign from puppeteer-endscreen test",
                 uploadedCSVFileReference: "not_a_file.csv",
