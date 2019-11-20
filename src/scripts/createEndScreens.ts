@@ -9,7 +9,7 @@ import { deleteEndCardElements } from '../lib/endcards/delete';
 import { createLayout1, createLayout2, createLayout3 } from '../lib/endcards/layout';
 import { updateEndScreenItem, EndScreenItemUpdateProps, createEndScreenArchiveIfNotExists, checkIsEndScreenItemMarkedAsCancelled, checkIsEndScreenCampaignMarkedAsCancelled } from '../lib/api';
 import { createEndScreenArchive } from '../lib/endcards/archive';
-
+import { getDynamicArtistPlaylistIdByVideoId } from '../lib/dap'
 const { interceptWaitForNetworkIdle } = require('@etidbury/helpers/util/puppeteer')
 
 
@@ -17,11 +17,14 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
 
     const primaryCardURL = action.actionProps.endScreenCampaignPrimaryCardURL
-    const secondaryCardURL = action.actionProps.endScreenCampaignSecondaryCardURL
+    let secondaryCardURL = action.actionProps.endScreenCampaignSecondaryCardURL
+
+    //console.log('secondaryCardURL:', secondaryCardURL)
 
     if (!primaryCardURL || !primaryCardURL.length) {
         throw new TypeError('Invalid endScreenCampaignPrimaryCardURL specified in action.actionProps')
     }
+
 
     let _endScreenCampaignIsCancelled
 
@@ -79,6 +82,32 @@ export default async ({ page }: ScriptArgs, action: Action) => {
             const targetVideoEndscreenEditorURL = generateEndScreenEditorURL(endScreenCampaignItem.youtubeVideoId)
 
             const targetVideoId = endScreenCampaignItem.youtubeVideoId
+
+
+
+
+
+            if (secondaryCardURL && secondaryCardURL.length && secondaryCardURL.trim().toLowerCase() === "auto") {
+
+                try {
+
+                    const dynamicArtistPlaylistId = await getDynamicArtistPlaylistIdByVideoId(targetVideoId)
+
+                    if (dynamicArtistPlaylistId && dynamicArtistPlaylistId.length) {
+                        secondaryCardURL = `https://www.youtube.com/playlist?list=${dynamicArtistPlaylistId}`
+                    } else {
+                        logEndScreenAction(`Failed to determine artist playlist from video ID: ${targetVideoId}`)
+                    }
+
+                } catch (err) {
+                    console.error('err', err)
+                    secondaryCardURL = ""
+                }
+            }
+
+
+
+
 
 
             await page.goto(targetVideoEndscreenEditorURL)
@@ -154,7 +183,10 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                 _hasFailedToCreateInitialCards = true
             }
 
-            const alertErrorElement = await page.$('.yt-alert-content')
+
+            const alertErrorElementText = await page.evaluate((el) => {
+                return el.innerText
+            }, await page.$('.yt-alert-content'))
 
             // const alertErrorElements = await page.evaluate(
             //     () => {
@@ -168,11 +200,13 @@ export default async ({ page }: ScriptArgs, action: Action) => {
             //     }
             // )
 
-            const hasExceededMaxNumElements = !!alertErrorElement
+            const hasExceededMaxNumElements = alertErrorElementText.length
+
             //const hasExceededMaxNumElements = false
 
             if (hasExceededMaxNumElements) {
                 logEndScreenAction("Has found error message specifying exceeded max number of elements")
+                logEndScreenAction(`alertErrorElementText: ${alertErrorElementText}`)
                 _hasFailedToCreateInitialCards = true
             }
 
@@ -274,7 +308,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                 }
             )
 
-            console.log('sss', annotationStatusError.toLowerCase().indexOf('all changes saved'))
+
             if (annotationStatusError && annotationStatusError.length &&
                 annotationStatusError.toLowerCase().indexOf('all changes saved') <= -1) {
 
