@@ -10,7 +10,7 @@
         "BASE_URL": "https://test-increment.now.sh"
     },
     "actionProps": {
-        "endScreenCampaignPrimaryCardURL": "https://www.youtube.com/watch?v=wFTMmf1aLi0",
+        "endScreenCampaignPrimaryCardURL": "auto-tp",
         "endScreenCampaignId": "cjydfhzge0sw20a59bepv0f0v",
         "endScreenCampaignItems": [
             {
