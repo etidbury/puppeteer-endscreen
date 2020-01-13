@@ -10,13 +10,14 @@ import { createLayout1, createLayout2, createLayout3 } from '../lib/endcards/lay
 import { updateEndScreenItem, EndScreenItemUpdateProps, createEndScreenArchiveIfNotExists, checkIsEndScreenItemMarkedAsCancelled, checkIsEndScreenCampaignMarkedAsCancelled } from '../lib/api';
 import { createEndScreenArchive } from '../lib/endcards/archive';
 import { getDynamicArtistPlaylistIdByVideoId } from '../lib/dap'
+import { getTopsifyAssignedPlaylistId } from '../lib/topsifyAssignedPlaylist';
 const { interceptWaitForNetworkIdle } = require('@etidbury/helpers/util/puppeteer')
 
 
 export default async ({ page }: ScriptArgs, action: Action) => {
 
 
-    const primaryCardURL = action.actionProps.endScreenCampaignPrimaryCardURL
+    let primaryCardURL = action.actionProps.endScreenCampaignPrimaryCardURL
     let secondaryCardURL = action.actionProps.endScreenCampaignSecondaryCardURL
 
     //console.log('secondaryCardURL:', secondaryCardURL)
@@ -24,6 +25,8 @@ export default async ({ page }: ScriptArgs, action: Action) => {
     if (!primaryCardURL || !primaryCardURL.length) {
         throw new TypeError('Invalid endScreenCampaignPrimaryCardURL specified in action.actionProps')
     }
+
+
 
 
     let _endScreenCampaignIsCancelled
@@ -86,10 +89,36 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
 
 
+            if (primaryCardURL && primaryCardURL.length && primaryCardURL.trim().toLowerCase() === "auto-tp") {
 
-            if (secondaryCardURL && secondaryCardURL.length && secondaryCardURL.trim().toLowerCase() === "auto") {
+                logEndScreenAction(`Looking up Topsify assigned playlist from API: ${targetVideoId}`)
+
+                try {
+
+                    const topsifyAssignedPlaylistId = await getTopsifyAssignedPlaylistId(targetVideoId)
+
+                    if (topsifyAssignedPlaylistId && topsifyAssignedPlaylistId.length) {
+                        primaryCardURL = `https://www.youtube.com/playlist?list=${topsifyAssignedPlaylistId}`
+                        logEndScreenAction(`Using assigned Topsify playlist URL: ${primaryCardURL}`)
+                    } else {
+                        throw new Error(`Failed to determine Topsify playlist from video ID: ${targetVideoId}`)
+                    }
+
+
+
+                } catch (err) {
+                    console.error('err', err)
+                    throw new Error(`Failed to determine Topsify playlist from video ID: ${targetVideoId}`)
+                    //primaryCardURL = ""
+                }
+
+            }
+
+
+            if (secondaryCardURL && secondaryCardURL.length && secondaryCardURL.trim().toLowerCase() === "auto-dap") {
 
                 logEndScreenAction(`Looking up DAP from API: ${targetVideoId}`)
+
                 try {
 
                     const dynamicArtistPlaylistId = await getDynamicArtistPlaylistIdByVideoId(targetVideoId)
@@ -102,6 +131,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
                 } catch (err) {
                     console.error('err', err)
+                    logEndScreenAction(`Failed to determine artist playlist from video ID: ${targetVideoId}`)
                     secondaryCardURL = ""
                 }
             }
