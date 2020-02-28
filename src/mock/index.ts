@@ -35,8 +35,8 @@ export const createTestEndScreenCampaignAndAction = async () => {
             }
         `, {
             data: {
-                primaryCardURL: "auto-tp",
-                secondaryCardURL: "auto-dap",
+                primaryCardURL: "auto-dav",
+                secondaryCardURL: "auto-tp",
 
                 notes: "testcampaign from puppeteer-endscreen test",
                 uploadedCSVFileReference: "not_a_file.csv",

@@ -11,6 +11,7 @@ import { updateEndScreenItem, EndScreenItemUpdateProps, createEndScreenArchiveIf
 import { createEndScreenArchive } from '../lib/endcards/archive';
 import { getDynamicArtistPlaylistIdByVideoId } from '../lib/dap'
 import { getTopsifyAssignedPlaylistId } from '../lib/topsifyAssignedPlaylist';
+import { getDAVByVideoId } from '../lib/dav';
 const { interceptWaitForNetworkIdle } = require('@etidbury/helpers/util/puppeteer')
 
 
@@ -89,7 +90,56 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
 
 
-            if (primaryCardURL && primaryCardURL.length && primaryCardURL.trim().toLowerCase() === "auto-tp") {
+
+
+
+            //getDAVByVideoId
+
+            // if (secondaryCardURL && secondaryCardURL.length && secondaryCardURL.trim().toLowerCase() === "auto-dap") {
+
+            //     logEndScreenAction(`Looking up DAP from API: ${targetVideoId}`)
+
+            //     try {
+
+            //         const dynamicArtistPlaylistId = await getDynamicArtistPlaylistIdByVideoId(targetVideoId)
+
+            //         if (dynamicArtistPlaylistId && dynamicArtistPlaylistId.length) {
+            //             secondaryCardURL = `https://www.youtube.com/playlist?list=${dynamicArtistPlaylistId}`
+            //         } else {
+            //             logEndScreenAction(`Failed to determine artist playlist from video ID: ${targetVideoId}`)
+            //         }
+
+            //     } catch (err) {
+            //         console.error('err', err)
+            //         logEndScreenAction(`Failed to determine artist playlist from video ID: ${targetVideoId}`)
+            //         secondaryCardURL = ""
+            //     }
+            // }
+
+            if (primaryCardURL && primaryCardURL.length && primaryCardURL.trim().toLowerCase() === "auto-dav") {
+
+                logEndScreenAction(`Looking up DAP from API: ${targetVideoId}`)
+
+                try {
+
+                    const dynamicYouTubeVideoId = await getDAVByVideoId(targetVideoId)
+
+                    if (dynamicYouTubeVideoId && dynamicYouTubeVideoId.length) {
+                        primaryCardURL = `https://www.youtube.com/watch?v=${dynamicYouTubeVideoId}`
+                    } else {
+                        logEndScreenAction(`Failed to determine dynamic video from video ID: ${targetVideoId}`)
+                    }
+
+                } catch (err) {
+                    console.error('err', err)
+                    logEndScreenAction(`Failed to determine dynamic video from video ID: ${targetVideoId}`)
+                    //throw new Error(`Failed to determine Topsify playlist from video ID: ${targetVideoId}`)
+                    primaryCardURL = ""
+                }
+            }
+
+
+            if (secondaryCardURL && secondaryCardURL.length && secondaryCardURL.trim().toLowerCase() === "auto-tp") {
 
                 logEndScreenAction(`Looking up Topsify assigned playlist from API: ${targetVideoId}`)
 
@@ -98,8 +148,8 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                     const topsifyAssignedPlaylistId = await getTopsifyAssignedPlaylistId(targetVideoId)
 
                     if (topsifyAssignedPlaylistId && topsifyAssignedPlaylistId.length) {
-                        primaryCardURL = `https://www.youtube.com/playlist?list=${topsifyAssignedPlaylistId}`
-                        logEndScreenAction(`Using assigned Topsify playlist URL: ${primaryCardURL}`)
+                        secondaryCardURL = `https://www.youtube.com/playlist?list=${topsifyAssignedPlaylistId}`
+                        logEndScreenAction(`Using assigned Topsify playlist URL: ${secondaryCardURL}`)
                     } else {
                         throw new Error(`Failed to determine Topsify playlist from video ID: ${targetVideoId}`)
                     }
@@ -108,38 +158,27 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
                 } catch (err) {
                     console.error('err', err)
-                    throw new Error(`Failed to determine Topsify playlist from video ID: ${targetVideoId}`)
-                    //primaryCardURL = ""
-                }
-
-            }
-
-
-            if (secondaryCardURL && secondaryCardURL.length && secondaryCardURL.trim().toLowerCase() === "auto-dap") {
-
-                logEndScreenAction(`Looking up DAP from API: ${targetVideoId}`)
-
-                try {
-
-                    const dynamicArtistPlaylistId = await getDynamicArtistPlaylistIdByVideoId(targetVideoId)
-
-                    if (dynamicArtistPlaylistId && dynamicArtistPlaylistId.length) {
-                        secondaryCardURL = `https://www.youtube.com/playlist?list=${dynamicArtistPlaylistId}`
-                    } else {
-                        logEndScreenAction(`Failed to determine artist playlist from video ID: ${targetVideoId}`)
-                    }
-
-                } catch (err) {
-                    console.error('err', err)
-                    logEndScreenAction(`Failed to determine artist playlist from video ID: ${targetVideoId}`)
+                    //throw new Error(`Failed to determine Topsify playlist from video ID: ${targetVideoId}`)
                     secondaryCardURL = ""
                 }
+
+            }
+
+
+            /**
+             * If second card URL available, use as primary and remove secondary.
+             * e.g. if the Topsify playlist is obtained but DAV is not, use Topsify playlist instead and default to 3 layout
+             */
+            if ((!primaryCardURL || !primaryCardURL.length) && secondaryCardURL && secondaryCardURL.length) {
+                primaryCardURL = secondaryCardURL
+                secondaryCardURL = ""
             }
 
 
 
-
-
+            if (!primaryCardURL || !primaryCardURL.length) {
+                throw new Error("No primary card URL found!")
+            }
 
             await page.goto(targetVideoEndscreenEditorURL)
 

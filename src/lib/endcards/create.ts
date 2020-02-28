@@ -3,6 +3,8 @@ import { logEndScreenAction } from "../logs";
 import { INPUT_VIDEO_URL_SELECTOR } from "../../config";
 
 
+const CREATE_BTNS_SELECTOR = '.annotator-create-button'
+
 export interface CreateCardOptions {
     primaryCardURL: string,
     primaryCard: boolean,
@@ -31,17 +33,45 @@ export const createCards = async (page: puppeteer.Page, { primaryCardURL, primar
         await page.waitForSelector('#endscreen-editor-add-element')
         await page.click('#endscreen-editor-add-element')
         await page.waitFor(2 * 1000)
-        await page.waitForSelector('.annotator-create-button')
-        await page.click('.annotator-create-button')
+        await page.waitForSelector(CREATE_BTNS_SELECTOR)
+        await page.click(CREATE_BTNS_SELECTOR)
         await page.waitForSelector('#annotator-video-type-fixed')
         await page.click('#annotator-video-type-fixed')
         await page.waitForSelector('#annotator-video-type-fixed')
         await page.click('#annotator-video-type-fixed')
         await page.waitFor(2 * 1000)
         inputs = await page.$$(INPUT_VIDEO_URL_SELECTOR)
-        await inputs[1].type(`${primaryCardURL}`)
-        await inputs[1].type(String.fromCharCode(13))
+
+
+        // await page.$eval(INPUT_VIDEO_URL_SELECTOR, (el, value) => {
+        //     //@ts-ignore
+        //     el.value = value
+        // }, `${primaryCardURL}${String.fromCharCode(13)}`);
+
+
+        const targetInput = inputs[1]
+
+
+        // const targetinput = await page.evaluate(
+        //     (targetInput) => {
+        //         return targetInput
+        //     }
+        //     , targetInput)
+
+        // console.log('trareti', targetInput)
+
+
+
+        await targetInput.type(`${primaryCardURL}`)
+        await targetInput.type(String.fromCharCode(13))
+
+        await page.waitFor(2 * 1000)
+
+
+
+
         logEndScreenAction('Create Primary End Card element: Complete')
+
 
         await page.waitFor(5 * 1000)
     }
@@ -53,7 +83,9 @@ export const createCards = async (page: puppeteer.Page, { primaryCardURL, primar
         await page.waitForSelector('#endscreen-editor-add-element')
         await page.click('#endscreen-editor-add-element')
         await page.waitFor(5 * 1000)
-        createBtns = await page.$$('.annotator-create-button')
+        //endscreen-editor-add-element
+        createBtns = await page.$$(CREATE_BTNS_SELECTOR)
+        //createBtns = await page.$$('#endscreen-editor-add-element')
         await createBtns[0].click()// select video button
         await page.waitForSelector('#annotator-video-type-best-for-viewer')
         await page.click('#annotator-video-type-best-for-viewer')
@@ -73,7 +105,7 @@ export const createCards = async (page: puppeteer.Page, { primaryCardURL, primar
         await page.waitForSelector('#endscreen-editor-add-element')
         await page.click('#endscreen-editor-add-element')
         await page.waitFor(5 * 1000)
-        createBtns = await page.$$('.annotator-create-button')
+        createBtns = await page.$$(CREATE_BTNS_SELECTOR)
 
         await createBtns[1].click()// select subscribe button
         // await page.waitForSelector('#annotator-video-type-best-for-viewer')
@@ -98,8 +130,8 @@ export const createCards = async (page: puppeteer.Page, { primaryCardURL, primar
             await page.waitForSelector('#endscreen-editor-add-element', { timeout: 5 * 1000 })
             await page.click('#endscreen-editor-add-element')
             await page.waitFor(2 * 1000)
-            await page.waitForSelector('.annotator-create-button')
-            await page.click('.annotator-create-button')
+            await page.waitForSelector(CREATE_BTNS_SELECTOR)
+            await page.click(CREATE_BTNS_SELECTOR)
             await page.waitForSelector('#annotator-video-type-fixed')
             await page.click('#annotator-video-type-fixed')
             await page.waitForSelector('#annotator-video-type-fixed')
