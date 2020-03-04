@@ -12,15 +12,18 @@ import { createEndScreenArchive } from '../lib/endcards/archive';
 import { getDynamicArtistPlaylistIdByVideoId } from '../lib/dap'
 import { getTopsifyAssignedPlaylistId } from '../lib/topsifyAssignedPlaylist';
 import { getDAVByVideoId } from '../lib/dav';
+import { recordAssignedEndCardHistory } from '../lib/assignedEndCardHistory';
 const { interceptWaitForNetworkIdle } = require('@etidbury/helpers/util/puppeteer')
 
 
 export default async ({ page }: ScriptArgs, action: Action) => {
 
 
+
     let primaryCardURL = action.actionProps.endScreenCampaignPrimaryCardURL
     let secondaryCardURL = action.actionProps.endScreenCampaignSecondaryCardURL
 
+    let endScreenCampaignId = action.actionProps.endScreenCampaignId
     //console.log('secondaryCardURL:', secondaryCardURL)
 
     if (!primaryCardURL || !primaryCardURL.length) {
@@ -66,7 +69,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
 
             const endScreenItemIsCancelled = await checkIsEndScreenItemMarkedAsCancelled(endScreenCampaignItem)
-            _endScreenCampaignIsCancelled = await checkIsEndScreenCampaignMarkedAsCancelled(action.actionProps.endScreenCampaignId)
+            _endScreenCampaignIsCancelled = await checkIsEndScreenCampaignMarkedAsCancelled(endScreenCampaignId)
 
             if (_endScreenCampaignIsCancelled || endScreenItemIsCancelled) {
                 _lastEndScreenCampaignItemCancelled = true
@@ -116,16 +119,18 @@ export default async ({ page }: ScriptArgs, action: Action) => {
             //     }
             // }
 
+
+            let _dynamicYouTubeVideoId = ""
             if (primaryCardURL && primaryCardURL.length && primaryCardURL.trim().toLowerCase() === "auto-dav") {
 
                 logEndScreenAction(`Looking up DAP from API: ${targetVideoId}`)
 
                 try {
 
-                    const dynamicYouTubeVideoId = await getDAVByVideoId(targetVideoId)
+                    _dynamicYouTubeVideoId = await getDAVByVideoId(targetVideoId)
 
-                    if (dynamicYouTubeVideoId && dynamicYouTubeVideoId.length) {
-                        primaryCardURL = `https://www.youtube.com/watch?v=${dynamicYouTubeVideoId}`
+                    if (_dynamicYouTubeVideoId && _dynamicYouTubeVideoId.length) {
+                        primaryCardURL = `https://www.youtube.com/watch?v=${_dynamicYouTubeVideoId}`
                     } else {
                         logEndScreenAction(`Failed to determine dynamic video from video ID: ${targetVideoId}`)
                     }
@@ -139,16 +144,17 @@ export default async ({ page }: ScriptArgs, action: Action) => {
             }
 
 
+            let _topsifyAssignedPlaylistId = ""
             if (secondaryCardURL && secondaryCardURL.length && secondaryCardURL.trim().toLowerCase() === "auto-tp") {
 
                 logEndScreenAction(`Looking up Topsify assigned playlist from API: ${targetVideoId}`)
 
                 try {
 
-                    const topsifyAssignedPlaylistId = await getTopsifyAssignedPlaylistId(targetVideoId)
+                    _topsifyAssignedPlaylistId = await getTopsifyAssignedPlaylistId(targetVideoId)
 
-                    if (topsifyAssignedPlaylistId && topsifyAssignedPlaylistId.length) {
-                        secondaryCardURL = `https://www.youtube.com/playlist?list=${topsifyAssignedPlaylistId}`
+                    if (_topsifyAssignedPlaylistId && _topsifyAssignedPlaylistId.length) {
+                        secondaryCardURL = `https://www.youtube.com/playlist?list=${_topsifyAssignedPlaylistId}`
                         logEndScreenAction(`Using assigned Topsify playlist URL: ${secondaryCardURL}`)
                     } else {
                         throw new Error(`Failed to determine Topsify playlist from video ID: ${targetVideoId}`)
@@ -416,8 +422,45 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                 await page.click(BTN_SAVE_SELECTOR)
 
 
+
                 //throw new Error(`Status error from YT: '${annotationStatusError}'`)
             }
+
+
+            try {
+
+                const assignedEndCardHistory = {
+                    targetYouTubeVideoId: targetVideoId,
+                    playlistCardYouTubePlaylistId: _topsifyAssignedPlaylistId,
+                    videoCardYouTubeVideoId: _dynamicYouTubeVideoId,
+                    endCardLayoutApplied: _endCardLayoutApplied || "",
+                    assignedAt: new Date().toISOString(),
+                    endscreenCampaignIdReference: endScreenCampaignId
+                }
+
+                console.debug('assignedEndCardHistory', assignedEndCardHistory)
+
+                if ((
+                    assignedEndCardHistory.playlistCardYouTubePlaylistId && assignedEndCardHistory.playlistCardYouTubePlaylistId.length
+                ) || (assignedEndCardHistory.videoCardYouTubeVideoId && assignedEndCardHistory.videoCardYouTubeVideoId.length)
+                ) {
+                    await recordAssignedEndCardHistory(assignedEndCardHistory)
+                } else {
+                    console.warn("assignedEndCardHistory: No cards specified, therefore skipping")
+                }
+
+
+            } catch (err) {
+                //fatal error, but shouldnt record as error as end card may have been successfully updated.
+                console.error("Failed to record assigned end card history:")
+                console.error(err)
+            }
+
+
+
+
+
+
 
         } catch (err) {
             console.error('Error occurred', err)
@@ -443,6 +486,8 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                     if (_endCardLayoutApplied) {
                         updateProps.endCardLayoutApplied = _endCardLayoutApplied
                     }
+
+
                 }
 
 
