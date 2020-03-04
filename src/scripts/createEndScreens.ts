@@ -20,13 +20,13 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
 
 
-    let primaryCardURL = action.actionProps.endScreenCampaignPrimaryCardURL
-    let secondaryCardURL = action.actionProps.endScreenCampaignSecondaryCardURL
+    let _primaryCardURL = action.actionProps.endScreenCampaignPrimaryCardURL
+    let _secondaryCardURL = action.actionProps.endScreenCampaignSecondaryCardURL
 
     let endScreenCampaignId = action.actionProps.endScreenCampaignId
-    //console.log('secondaryCardURL:', secondaryCardURL)
+    //console.log('_secondaryCardURL:', _secondaryCardURL)
 
-    if (!primaryCardURL || !primaryCardURL.length) {
+    if (!_primaryCardURL || !_primaryCardURL.length) {
         throw new TypeError('Invalid endScreenCampaignPrimaryCardURL specified in action.actionProps')
     }
 
@@ -37,6 +37,11 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
 
     for (let endScreenCampaignItemIndex = 0; endScreenCampaignItemIndex < action.actionProps.endScreenCampaignItems.length; endScreenCampaignItemIndex++) {
+
+        //reset
+        _primaryCardURL = action.actionProps.endScreenCampaignPrimaryCardURL
+        _secondaryCardURL = action.actionProps.endScreenCampaignSecondaryCardURL
+
 
         if (_endScreenCampaignIsCancelled) {
             console.debug('Not continuing because campaign is cancelled...')
@@ -98,7 +103,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
             //getDAVByVideoId
 
-            // if (secondaryCardURL && secondaryCardURL.length && secondaryCardURL.trim().toLowerCase() === "auto-dap") {
+            // if (_secondaryCardURL && _secondaryCardURL.length && _secondaryCardURL.trim().toLowerCase() === "auto-dap") {
 
             //     logEndScreenAction(`Looking up DAP from API: ${targetVideoId}`)
 
@@ -107,7 +112,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
             //         const dynamicArtistPlaylistId = await getDynamicArtistPlaylistIdByVideoId(targetVideoId)
 
             //         if (dynamicArtistPlaylistId && dynamicArtistPlaylistId.length) {
-            //             secondaryCardURL = `https://www.youtube.com/playlist?list=${dynamicArtistPlaylistId}`
+            //             _secondaryCardURL = `https://www.youtube.com/playlist?list=${dynamicArtistPlaylistId}`
             //         } else {
             //             logEndScreenAction(`Failed to determine artist playlist from video ID: ${targetVideoId}`)
             //         }
@@ -115,13 +120,13 @@ export default async ({ page }: ScriptArgs, action: Action) => {
             //     } catch (err) {
             //         console.error('err', err)
             //         logEndScreenAction(`Failed to determine artist playlist from video ID: ${targetVideoId}`)
-            //         secondaryCardURL = ""
+            //         _secondaryCardURL = ""
             //     }
             // }
 
 
             let _dynamicYouTubeVideoId = ""
-            if (primaryCardURL && primaryCardURL.length && primaryCardURL.trim().toLowerCase() === "auto-dav") {
+            if (_primaryCardURL && _primaryCardURL.length && _primaryCardURL.trim().toLowerCase() === "auto-dav") {
 
                 logEndScreenAction(`Looking up DAP from API: ${targetVideoId}`)
 
@@ -130,7 +135,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                     _dynamicYouTubeVideoId = await getDAVByVideoId(targetVideoId)
 
                     if (_dynamicYouTubeVideoId && _dynamicYouTubeVideoId.length) {
-                        primaryCardURL = `https://www.youtube.com/watch?v=${_dynamicYouTubeVideoId}`
+                        _primaryCardURL = `https://www.youtube.com/watch?v=${_dynamicYouTubeVideoId}`
                     } else {
                         logEndScreenAction(`Failed to determine dynamic video from video ID: ${targetVideoId}`)
                     }
@@ -139,13 +144,13 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                     console.error('err', err)
                     logEndScreenAction(`Failed to determine dynamic video from video ID: ${targetVideoId}`)
                     //throw new Error(`Failed to determine Topsify playlist from video ID: ${targetVideoId}`)
-                    primaryCardURL = ""
+                    _primaryCardURL = ""
                 }
             }
 
 
             let _topsifyAssignedPlaylistId = ""
-            if (secondaryCardURL && secondaryCardURL.length && secondaryCardURL.trim().toLowerCase() === "auto-tp") {
+            if (_secondaryCardURL && _secondaryCardURL.length && _secondaryCardURL.trim().toLowerCase() === "auto-tp") {
 
                 logEndScreenAction(`Looking up Topsify assigned playlist from API: ${targetVideoId}`)
 
@@ -154,8 +159,8 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                     _topsifyAssignedPlaylistId = await getTopsifyAssignedPlaylistId(targetVideoId)
 
                     if (_topsifyAssignedPlaylistId && _topsifyAssignedPlaylistId.length) {
-                        secondaryCardURL = `https://www.youtube.com/playlist?list=${_topsifyAssignedPlaylistId}`
-                        logEndScreenAction(`Using assigned Topsify playlist URL: ${secondaryCardURL}`)
+                        _secondaryCardURL = `https://www.youtube.com/playlist?list=${_topsifyAssignedPlaylistId}`
+                        logEndScreenAction(`Using assigned Topsify playlist URL: ${_secondaryCardURL}`)
                     } else {
                         throw new Error(`Failed to determine Topsify playlist from video ID: ${targetVideoId}`)
                     }
@@ -165,7 +170,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                 } catch (err) {
                     console.error('err', err)
                     //throw new Error(`Failed to determine Topsify playlist from video ID: ${targetVideoId}`)
-                    secondaryCardURL = ""
+                    _secondaryCardURL = ""
                 }
 
             }
@@ -175,14 +180,14 @@ export default async ({ page }: ScriptArgs, action: Action) => {
              * If second card URL available, use as primary and remove secondary.
              * e.g. if the Topsify playlist is obtained but DAV is not, use Topsify playlist instead and default to 3 layout
              */
-            if ((!primaryCardURL || !primaryCardURL.length) && secondaryCardURL && secondaryCardURL.length) {
-                primaryCardURL = secondaryCardURL
-                secondaryCardURL = ""
+            if ((!_primaryCardURL || !_primaryCardURL.length) && _secondaryCardURL && _secondaryCardURL.length) {
+                _primaryCardURL = _secondaryCardURL
+                _secondaryCardURL = ""
             }
 
 
 
-            if (!primaryCardURL || !primaryCardURL.length) {
+            if (!_primaryCardURL || !_primaryCardURL.length) {
                 throw new Error("No primary card URL found!")
             }
 
@@ -245,12 +250,12 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
             try {
                 const { createdSecondaryCard } = await createCards(page, {
-                    primaryCardURL,
+                    primaryCardURL: _primaryCardURL,
                     primaryCard: true,
                     bestForViewerCard: true,
                     subscribeCard: true,
-                    secondaryCard: !!secondaryCardURL && secondaryCardURL.length > 0,
-                    secondaryCardURL: secondaryCardURL
+                    secondaryCard: !!_secondaryCardURL && _secondaryCardURL.length > 0,
+                    secondaryCardURL: _secondaryCardURL
                 })
                 _createdSecondaryCard = createdSecondaryCard
 
@@ -343,7 +348,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                     await deleteEndCardElements(page)
 
                     await createCards(page, {
-                        primaryCardURL,
+                        primaryCardURL: _primaryCardURL,
                         primaryCard: true,
                         bestForViewerCard: true,
                         subscribeCard: false, //dont add subscribe button,
@@ -395,7 +400,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                 await deleteEndCardElements(page)
 
                 await createCards(page, {
-                    primaryCardURL,
+                    primaryCardURL: _primaryCardURL,
                     primaryCard: true,
                     bestForViewerCard: true,
                     subscribeCard: false, //dont add subscribe button,
@@ -440,9 +445,12 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
                 console.debug('assignedEndCardHistory', assignedEndCardHistory)
 
-                if ((
-                    assignedEndCardHistory.playlistCardYouTubePlaylistId && assignedEndCardHistory.playlistCardYouTubePlaylistId.length
-                ) || (assignedEndCardHistory.videoCardYouTubeVideoId && assignedEndCardHistory.videoCardYouTubeVideoId.length)
+                if (
+                    (
+                        assignedEndCardHistory.playlistCardYouTubePlaylistId && assignedEndCardHistory.playlistCardYouTubePlaylistId.length
+                    )
+                    ||
+                    (assignedEndCardHistory.videoCardYouTubeVideoId && assignedEndCardHistory.videoCardYouTubeVideoId.length)
                 ) {
                     await recordAssignedEndCardHistory(assignedEndCardHistory)
                 } else {
