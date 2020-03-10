@@ -8,7 +8,7 @@ const BASE_API_URL = 'https://wmg-youtube-playlist-api.now.sh'
 export const getDAVByVideoId = async (targetYouTubeVideoId: string) => {
 
     return Axios.get(
-        urljoin(BASE_API_URL, `/dav/recommended?id=k2qgadSvNyU${encodeURIComponent(targetYouTubeVideoId)}`)
+        urljoin(BASE_API_URL, `/dav/recommended?id=${encodeURIComponent(targetYouTubeVideoId)}`)
     ).then((r) => {
 
         if (r.status < 300 && r.status >= 200) {
