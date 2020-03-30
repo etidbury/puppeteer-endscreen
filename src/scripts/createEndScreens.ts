@@ -1,12 +1,12 @@
 import { ScriptArgs, EndScreenItem } from '../types'
 import { generateEndScreenEditorURL, checkIsSaveButtonDisabled } from '../lib/endscreen';
 import { Action } from '../lib/action';
-import { LOGIN_EMAIL_SELECTOR, GOOGLE_USERNAME, LOGIN_PASSWORD_SELECTOR, GOOGLE_PASSWORD, EDITABLE_ELEMENT_SELECTOR, ENDCARD_SAFE_AREA_SELECTOR, MIN_ENDCARD_SAFEAREA_WIDTH, BTN_SAVE_SELECTOR } from '../config';
+import { LOGIN_EMAIL_SELECTOR, GOOGLE_USERNAME, LOGIN_PASSWORD_SELECTOR, GOOGLE_PASSWORD, EDITABLE_ELEMENT_SELECTOR, ENDCARD_SAFE_AREA_SELECTOR, MIN_ENDCARD_SAFEAREA_WIDTH, BTN_SAVE_SELECTOR, BTN_ENDSCREEN_EDITOR_OPEN_SELECTOR, ALERT_MESSAGE_SELECTOR } from '../config';
 import { logEndScreenAction } from '../lib/logs';
 
 import { createCards } from '../lib/endcards/create'
 import { deleteEndCardElements } from '../lib/endcards/delete';
-import { createLayout1, createLayout2, createLayout3 } from '../lib/endcards/layout';
+import { createLayout1, createLayout2, createLayout3, resetLayout3 } from '../lib/endcards/layout';
 import { updateEndScreenItem, EndScreenItemUpdateProps, createEndScreenArchiveIfNotExists, checkIsEndScreenItemMarkedAsCancelled, checkIsEndScreenCampaignMarkedAsCancelled } from '../lib/api';
 import { createEndScreenArchive } from '../lib/endcards/archive';
 import { getDynamicArtistPlaylistIdByVideoId } from '../lib/dap'
@@ -196,6 +196,13 @@ export default async ({ page }: ScriptArgs, action: Action) => {
             await interceptWaitForNetworkIdle(page, 5 * 1000)
 
 
+
+
+            //open endscreen editor modal
+            await page.click(BTN_ENDSCREEN_EDITOR_OPEN_SELECTOR)
+            await page.waitFor(2 * 1000)
+
+
             //createEndScreenArchiveIfNotExists
 
 
@@ -213,6 +220,8 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
 
 
+            //  .edit-overlay
+
             const playerGridSafeArea = await page.$(ENDCARD_SAFE_AREA_SELECTOR)
             if (!playerGridSafeArea) {
                 throw Error('Failed to find playerGridSafeArea')
@@ -228,19 +237,24 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
             if (endScreenSafeArea.width < MIN_ENDCARD_SAFEAREA_WIDTH) {
 
-                logEndScreenAction(`End screen safe area not wide enough (min:${MIN_ENDCARD_SAFEAREA_WIDTH})for video ${targetVideoId}`, true)
+                logEndScreenAction(`End screen safe area not wide enough (min:${MIN_ENDCARD_SAFEAREA_WIDTH})for video ${targetVideoId}. Currently: ${endScreenSafeArea.width}`, true)
                 throw new Error('End screen safe area not wide enough')
 
             }
 
             try {
 
-
                 await createEndScreenArchive(page, endScreenCampaignItem)
 
             } catch (err) {
                 console.warn("Failed to store archive. Ignoring...")
             }
+
+
+            //open endscreen editor modal
+            await page.click(BTN_ENDSCREEN_EDITOR_OPEN_SELECTOR)
+            await page.waitFor(2 * 1000)
+
 
             await deleteEndCardElements(page)
 
@@ -249,6 +263,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
             let _createdSecondaryCard = false
 
             try {
+
                 const { createdSecondaryCard } = await createCards(page, {
                     primaryCardURL: _primaryCardURL,
                     primaryCard: true,
@@ -257,6 +272,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                     secondaryCard: !!_secondaryCardURL && _secondaryCardURL.length > 0,
                     secondaryCardURL: _secondaryCardURL
                 })
+                _endCardLayoutApplied = "layout_4a"
                 _createdSecondaryCard = createdSecondaryCard
 
             } catch (err) {
@@ -267,7 +283,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
             const alertErrorElementText = await page.evaluate((el) => {
                 return el.innerText
-            }, await page.$('.yt-alert-content'))
+            }, await page.$(ALERT_MESSAGE_SELECTOR))
 
             // const alertErrorElements = await page.evaluate(
             //     () => {
@@ -291,34 +307,36 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                 _hasFailedToCreateInitialCards = true
             }
 
-            if (!_hasFailedToCreateInitialCards) {
+            // if (!_hasFailedToCreateInitialCards) {
 
-                if (_createdSecondaryCard) {
-                    await createLayout3(page)
-                    _endCardLayoutApplied = 'layout_3b'
-                } else {
-                    await createLayout1(page)
-                    _endCardLayoutApplied = 'layout_1b'
-                }
-            }
+            //     if (_createdSecondaryCard) {
 
-            if (_hasFailedToCreateInitialCards) {
+            //         // await resetLayout3(page)
+            //         await createLayout3(page)
+            //         _endCardLayoutApplied = 'layout_3b'
+            //     } else {
+            //         await createLayout1(page)
+            //         _endCardLayoutApplied = 'layout_1b'
+            //     }
+            // }
 
-                logEndScreenAction("Closing select element overlay")
+            // if (_hasFailedToCreateInitialCards) {
 
-                await page.evaluate(
-                    () => {
-                        const el = document.getElementsByClassName('yt-uix-overlay-close')[0]
+            //     logEndScreenAction("Closing select element overlay")
+
+            //     await page.evaluate(
+            //         () => {
+            //             const el = document.getElementsByClassName('yt-uix-overlay-close')[0]
 
 
-                        //@ts-ignore
-                        el.click()
-                    }
-                )
+            //             //@ts-ignore
+            //             el.click()
+            //         }
+            //     )
 
-                await page.waitFor(1000)
+            //     await page.waitFor(1000)
 
-            }
+            // }
 
 
 
@@ -344,22 +362,26 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
 
                     // reset and create layout 2
-                    logEndScreenAction(`Save disabled. Attempt creating layout 2 for video ${targetVideoId}`)
-                    await deleteEndCardElements(page)
 
-                    await createCards(page, {
-                        primaryCardURL: _primaryCardURL,
-                        primaryCard: true,
-                        bestForViewerCard: true,
-                        subscribeCard: false, //dont add subscribe button,
-                        secondaryCard: false
-                    })
+                    logEndScreenAction(`Save disabled. Fallback to layout 2 not yet implemented: ${targetVideoId}`)
+                    throw new Error("Fallback to layout 2 not yet implemented.")
 
-                    await page.waitFor(5 * 1000)
+                    // logEndScreenAction(`Save disabled. Attempt creating layout 2 for video ${targetVideoId}`)
+                    // await deleteEndCardElements(page)
 
-                    await createLayout2(page)
+                    // await createCards(page, {
+                    //     primaryCardURL: _primaryCardURL,
+                    //     primaryCard: true,
+                    //     bestForViewerCard: true,
+                    //     subscribeCard: false, //dont add subscribe button,
+                    //     secondaryCard: false
+                    // })
 
-                    _endCardLayoutApplied = 'layout_2b'
+                    // await page.waitFor(5 * 1000)
+
+                    // await createLayout2(page)
+
+                    // _endCardLayoutApplied = 'layout_2b'
                 }
             }
 

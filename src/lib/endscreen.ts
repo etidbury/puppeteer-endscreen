@@ -7,7 +7,7 @@ import puppeteer from 'puppeteer'
 
 
 export const generateEndScreenEditorURL = (youtubeVideoId) => {
-    return `https://www.youtube.com/endscreen?v=${youtubeVideoId}&ar=2&nv=1`
+    return `https://studio.youtube.com/video/${youtubeVideoId}/edit?utm_campaign=upgrade&utm_medium=redirect&utm_source=%2Fmy_videos`
 }
 
 export const checkIsSaveButtonDisabled = async (page: puppeteer.Page) => {

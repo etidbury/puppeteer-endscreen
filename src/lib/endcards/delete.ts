@@ -1,5 +1,5 @@
 import { CreateCardOptions } from "./create";
-import { EDITABLE_ELEMENT_SELECTOR } from "../../config";
+import { EDITABLE_ELEMENT_SELECTOR, TEXT_SNIPPET_IDENTIFY_ENDSCREEN_PAGE } from "../../config";
 import { logEndScreenAction } from "../logs";
 import puppeteer from 'puppeteer'
 
@@ -11,8 +11,6 @@ export const deleteEndCardElements = async (page: puppeteer.Page) => {
         return el.innerText
     }, await page.$('body'))
 
-    //todo: make more verbose
-    const TEXT_SNIPPET_IDENTIFY_ENDSCREEN_PAGE = `Preview`
 
     if (afterNetworkIdleInnerText.indexOf(TEXT_SNIPPET_IDENTIFY_ENDSCREEN_PAGE) <= -1) {
         throw new Error('Current page does not seem to be expected Endscreen page')

@@ -1,9 +1,10 @@
 import puppeteer from 'puppeteer'
 import { EndScreenItem } from '../../types'
 import { createEndScreenArchiveIfNotExists } from '../api'
-import { EDITABLE_ELEMENT_SELECTOR, BTN_SAVE_SELECTOR } from '../../config';
+import { EDITABLE_ELEMENT_SELECTOR, BTN_SAVE_SELECTOR, TEXT_SNIPPET_IDENTIFY_ENDSCREEN_PAGE } from '../../config';
 import { logEndScreenAction } from '../logs'
 import { checkIsSaveButtonDisabled } from '../endscreen';
+import { nudgeEditableElement } from './layout';
 
 let _to
 const _interceptEndCardSave = async (page: puppeteer.Page, endScreenCampaignItem: EndScreenItem) => {
@@ -47,7 +48,7 @@ const _interceptEndCardSave = async (page: puppeteer.Page, endScreenCampaignItem
 
                 const post = interceptedRequest.postData() as any
 
-                if (interceptedRequest.url().toLowerCase().indexOf('youtube.com/endscreen_ajax') > -1
+                if (interceptedRequest.url().toLowerCase().indexOf('youtubei/v1/video_editor/edit_video') > -1
 
                     // && post && post.indexOf('endscreen=') > -1
                 ) {
@@ -62,7 +63,7 @@ const _interceptEndCardSave = async (page: puppeteer.Page, endScreenCampaignItem
 
                         let endScreenData = JSON.parse(post)
 
-                        if (endScreenData.elements && endScreenData.elements.length) {
+                        if (endScreenData.endscreenEdit) {
 
                             await createEndScreenArchiveIfNotExists(endScreenCampaignItem, endScreenData).catch((err) => {
                                 _reject(err)
@@ -108,8 +109,6 @@ const _triggerEnableEndCardSaving = async (page: puppeteer.Page) => {
         return el.innerText
     }, await page.$('body'))
 
-    //todo: make more verbose
-    const TEXT_SNIPPET_IDENTIFY_ENDSCREEN_PAGE = `Preview`
 
     if (afterNetworkIdleInnerText.indexOf(TEXT_SNIPPET_IDENTIFY_ENDSCREEN_PAGE) <= -1) {
         throw new Error('Current page does not seem to be expected Endscreen page')
@@ -124,6 +123,8 @@ const _triggerEnableEndCardSaving = async (page: puppeteer.Page) => {
 
         editableElements[0].click()
 
+
+        await nudgeEditableElement(page, editableElements[0])
         await page.waitFor(2 * 1000)
 
         const isSaveBtnDisabled = await checkIsSaveButtonDisabled(page)
@@ -147,13 +148,12 @@ export const createEndScreenArchive = async (page: puppeteer.Page, endScreenCamp
 
     try {
 
-
-
         await _triggerEnableEndCardSaving(page)
 
         await _interceptEndCardSave(page, endScreenCampaignItem)
 
         logEndScreenAction('Finished archiving')
+
         await page.waitFor(2 * 1000)
 
     } catch (err) {

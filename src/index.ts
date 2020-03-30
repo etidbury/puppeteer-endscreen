@@ -34,6 +34,12 @@ const init = async () => {
 
         browser = await puppeteer.launch({
             args: [
+                // '--kiosk',
+                // '--enable-kiosk-mode',
+                /**
+                 * https://unix.stackexchange.com/questions/273989/how-can-i-make-chromium-start-full-screen-under-x
+                 */
+                '--window-size=1980,1000',
                 '--start-fullscreen',
                 //    "--disable-gpu",
                 '--disable-setuid-sandbox',
@@ -91,7 +97,7 @@ const init = async () => {
         page.removeListener('dialog', onDialog)
         page.on('dialog', onDialog)
 
-        await page.setViewport({ width: 1282, height: 701 })
+        await page.setViewport({ width: 1920, height: 1000 })
 
         console.debug('Running scripts...')
 

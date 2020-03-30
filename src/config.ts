@@ -1,4 +1,4 @@
-export const EDITABLE_ELEMENT_SELECTOR = '.editable-element'
+export const EDITABLE_ELEMENT_SELECTOR = 'ytve-endscreen-editor-preview-overlay-item.visible'
 export const INPUT_VIDEO_URL_SELECTOR = 'input[name=\'video_url\']'
 export const LOGIN_EMAIL_SELECTOR = 'input[type=email]'
 export const LOGIN_PASSWORD_SELECTOR = 'input[type=password]'
@@ -6,6 +6,22 @@ export const SLACK_POST_MESSAGE_WEBHOOK_URL = 'https://hooks.slack.com/services/
 
 export const MAX_LOG_ENTRY_TRANSPORT = 20
 
+export const TEXT_SNIPPET_IDENTIFY_ENDSCREEN_PAGE = `End screen`
+
+export const ENDSCREEN_EDITOR_ADD_ELEMENT_SELECTOR = '#add-element-menu-button'
+
+export const BTN_ENDSCREEN_EDITOR_OPEN_SELECTOR = '#endscreen-editor-link'
+
+export const BTN_OPTION_CREATE_ENDCARD_VIDEO_SELECTOR = '[test-id="VIDEO"]'
+export const BTN_OPTION_CREATE_ENDCARD_PLAYLIST_SELECTOR = '[test-id="PLAYLIST"]'
+export const BTN_OPTION_CREATE_ENDCARD_SUBSCRIBE_SELECTOR = '[test-id="SUBSCRIBE"]'
+
+export const ALERT_MESSAGE_SELECTOR = '#plugin-message'
+
+//best for viewer
+export const BTN_OPTION_CREATE_ENDCARD_VIDEO_BFV_SELECTOR = '#best-for-viewer'
+//choose video
+export const BTN_OPTION_CREATE_ENDCARD_VIDEO_CV_SELECTOR = '#choose-video'
 
 
 if (!process.env.GOOGLE_USERNAME || !process.env.GOOGLE_USERNAME.length) {
@@ -25,9 +41,9 @@ export const GOOGLE_PASSWORD = process.env.GOOGLE_PASSWORD
 
 //export const VIDEO_LIST_SPREADSHEET_ID = process.env.VIDEO_LIST_SPREADSHEET_ID
 
-export const BTN_SAVE_SELECTOR = '#endscreen-editor-save'
+export const BTN_SAVE_SELECTOR = '#save-button'
 
-export const ENDCARD_SAFE_AREA_SELECTOR = '.playergrid-safe-area'
+export const ENDCARD_SAFE_AREA_SELECTOR = '#tap-area'
 
 export const MIN_ENDCARD_SAFEAREA_WIDTH = 390
 /**
