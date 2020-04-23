@@ -141,7 +141,8 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                     }
 
                 } catch (err) {
-                    console.error('err', err)
+                    console.error('err', err && err.response && err.response.data || err && err.response || err)
+
                     logEndScreenAction(`Failed to determine dynamic video from video ID: ${targetVideoId}`)
                     //throw new Error(`Failed to determine Topsify playlist from video ID: ${targetVideoId}`)
                     _primaryCardURL = ""
@@ -168,7 +169,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
 
                 } catch (err) {
-                    console.error('err', err)
+                    console.error('err', err && err.response && err.response.data || err && err.response || err)
                     //throw new Error(`Failed to determine Topsify playlist from video ID: ${targetVideoId}`)
                     _secondaryCardURL = ""
                 }

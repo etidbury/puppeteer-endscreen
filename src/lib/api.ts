@@ -9,8 +9,9 @@ import { EndScreenItem } from "../types";
 export const fetchGQLQueryEndScreen = async (query: ASTNode, variables = {}): Promise<any> => {
     try {
 
+        console.log("ENDSCREEN_BOT_GQL_URL", ENDSCREEN_BOT_GQL_URL)
         const { data: { data } } = await Axios.post(
-            urljoin(ENDSCREEN_BOT_GQL_URL)
+            ENDSCREEN_BOT_GQL_URL + ""
             , {
                 query: print(query),
                 variables

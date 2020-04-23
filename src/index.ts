@@ -130,6 +130,13 @@ const init = async () => {
 
     } catch (err) {
         console.error('err', err)
+
+        if (err && err.response && err.response.data) {
+            console.error("Error response", err.response.data)
+        } else {
+            console.error("Error", err)
+        }
+
         browser.close()
         process.exit(1)
     }
