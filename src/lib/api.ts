@@ -5,6 +5,7 @@ const urljoin = require('url-join')
 import { ENDSCREEN_BOT_GQL_URL } from '../config'
 import { gql } from "apollo-boost";
 import { EndScreenItem } from "../types";
+import logger from './dataDogLogHelper'
 
 export const fetchGQLQueryEndScreen = async (query: ASTNode, variables = {}): Promise<any> => {
     try {
@@ -35,6 +36,9 @@ export const fetchGQLQueryEndScreen = async (query: ASTNode, variables = {}): Pr
 
 
     } catch (err) {
+
+        await logger.debug(`fetchGQLQueryEndScreen(): Error thrown trying to run Graphql query - ${err && err.response && err.response.data ? JSON.stringify(err.response.data) : err.message}`, __filename)
+
         console.error('err', err && err.response && err.response.data || err && err.response || err)
         console.info('GQLQuery:', print(query))
         console.info('Variables:', variables)

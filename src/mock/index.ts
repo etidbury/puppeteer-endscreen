@@ -59,7 +59,7 @@ export const createTestEndScreenCampaignAndAction = async () => {
 
     } catch (err) {
         console.error(err)
-        throw Error('Failed to create test end screen campaign')
+        throw Error(`createTestEndScreenCampaignAndAction(): Failed to create test end screen campaign: ${err.message}`)
     }
 
     const action = {

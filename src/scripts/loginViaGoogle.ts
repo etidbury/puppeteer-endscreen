@@ -4,15 +4,16 @@ import { Action } from '../lib/action';
 import { LOGIN_EMAIL_SELECTOR, GOOGLE_USERNAME, LOGIN_PASSWORD_SELECTOR, GOOGLE_PASSWORD } from '../config';
 import { logEndScreenAction } from '../lib/logs';
 const { interceptWaitForNetworkIdle } = require('@etidbury/helpers/util/puppeteer')
+import logger from '../lib/dataDogLogHelper'
 
 export default async ({ page }: ScriptArgs, action: Action) => {
 
     const homepage = generateEndScreenEditorURL(action.actionProps.endScreenCampaignItems[0].youtubeVideoId)
 
     await page.goto(homepage, { timeout: 60 * 1000 })
-    console.debug('Waiting for network to be idle')
+    await logger.debug('Waiting for network to be idle')
     //await interceptWaitForNetworkIdle(page, 5 * 1000)
-    console.debug('Network now idle')
+    await logger.debug('Network now idle')
 
     const EXPECTED_TEXT = 'Sign in'
 
@@ -21,7 +22,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
     }, await page.$('body'))
 
     if (innerText.indexOf(EXPECTED_TEXT) <= -1) {
-        throw new Error(`Failed to find text '${EXPECTED_TEXT}' in body`)
+        throw new Error(`loginViaGoogle(): Failed to find text '${EXPECTED_TEXT}' in body`)
     }
 
     await page.waitFor(LOGIN_EMAIL_SELECTOR)
@@ -32,7 +33,9 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
     await page.type(LOGIN_EMAIL_SELECTOR, String.fromCharCode(13), { delay: 1000 })
 
-    logEndScreenAction('Login: Waiting for password input')
+    await logger.debug('loginViaGoogle(): Login: Waiting for password input')
+
+
 
 
 
@@ -56,6 +59,9 @@ export default async ({ page }: ScriptArgs, action: Action) => {
     if (afterLoginInputInnerText.indexOf(TEXT_SNIPPET_IDENTIFY_VERIFY_DEVICE) > -1) {
 
         console.debug('Requires 2FA authentication via Google to proceed')
+
+        await logger.error('loginViaGoogle(): Requires 2FA authentication via Google to proceed')
+
         await page.click('#authzenNext')
 
         //todo: send bot vnc link to slack with message about verification
@@ -63,8 +69,9 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
     }
 
-    console.debug('Should be logged in now.')
+    //console.debug('Should be logged in now.')
 
+    await logger.debug('loginViaGoogle(): Should be logged in now.')
 
 
 }

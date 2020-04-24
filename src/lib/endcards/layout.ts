@@ -3,6 +3,8 @@ import { logEndScreenAction } from "../logs";
 
 import puppeteer, { Page, BoundingBox } from 'puppeteer'
 
+import logger from '../../lib/dataDogLogHelper'
+
 const PADDING = 3
 
 /**
@@ -75,13 +77,13 @@ const _determineEndCardPosition = async (page: Page, editableElementBoundingBox:
     const { x, y, width, height } = editableElementBoundingBox
 
     if (!playerGridSafeArea) {
-        throw new Error('Failed to find playerGridSafeArea')
+        throw new Error('_determineEndCardPosition(): Failed to find playerGridSafeArea')
     }
 
     const endScreenSafeArea = await playerGridSafeArea.boundingBox()
 
     if (!endScreenSafeArea) {
-        throw new Error('Failed to find endScreenSafeArea')
+        throw new Error('_determineEndCardPosition(): Failed to find endScreenSafeArea')
     }
 
     const PADDING = 5
@@ -110,7 +112,7 @@ const _determineEndCardPosition = async (page: Page, editableElementBoundingBox:
 
         default:
 
-            throw new Error("Invalid end card position specified")
+            throw new Error("_determineEndCardPosition(): Invalid end card position specified")
 
 
     }
@@ -164,13 +166,13 @@ export const createLayout1 = async (page: puppeteer.Page) => {
 
 
     if (!playerGridSafeArea) {
-        throw new Error('Failed to find playerGridSafeArea')
+        throw new Error('createLayout1() Failed to find playerGridSafeArea')
     }
 
     const endScreenSafeArea = await playerGridSafeArea.boundingBox()
 
     if (!endScreenSafeArea) {
-        throw new Error('Failed to find endScreenSafeArea')
+        throw new Error('createLayout1() Failed to find endScreenSafeArea')
     }
 
     logEndScreenAction('Move End Card elements: Processing layout 1...')
@@ -363,7 +365,7 @@ export const createLayout3 = async (page: puppeteer.Page) => {
         throw new Error('Failed to find endScreenSafeArea')
     }
 
-    logEndScreenAction('Move End Card elements: Processing layout 3...')
+    logEndScreenAction(`Move End Card elements: Processing layout 3...`)
 
     /*
     0-video

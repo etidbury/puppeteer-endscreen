@@ -14,7 +14,7 @@ export const getDynamicArtistPlaylistIdByVideoId = async (targetYouTubeVideoId: 
         if (r.status < 300 && r.status >= 200) {
             return r
         } else {
-            throw new Error(`Request error status code: ${r.status}`)
+            throw new Error(`getDynamicArtistPlaylistIdByVideoId(): Request error status code: ${r.status}`)
         }
     }).then(({ data }) => {
 

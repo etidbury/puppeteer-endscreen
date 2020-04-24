@@ -22,7 +22,7 @@ export const recordAssignedEndCardHistory = async (assignedEndCardHistory: {
         if (r.status < 300 && r.status >= 200) {
             return r
         } else {
-            throw new Error(`Request error status code: ${r.status}`)
+            throw new Error(`recordAssignedEndCardHistory(): Request error status code: ${r.status}`)
         }
     }).then(({ data }) => {
 

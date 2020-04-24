@@ -14,7 +14,7 @@ export const getDAVByVideoId = async (targetYouTubeVideoId: string) => {
         if (r.status < 300 && r.status >= 200) {
             return r
         } else {
-            throw new Error(`Request error status code: ${r.status}`)
+            throw new Error(`getDAVByVideoId(): Request error status code: ${r.status}`)
         }
     }).then(({ data }) => {
 

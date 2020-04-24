@@ -39,6 +39,7 @@ const _fetchGQLQueryBotManager = async (query: ASTNode, variables = {}): Promise
     } catch (err) {
 
         console.error('err', err && err.response && err.response.data || err && err.response || err)
+
         console.info('GQLQuery:', print(query))
         console.info('Variables:', variables)
 

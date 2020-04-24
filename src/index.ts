@@ -13,7 +13,7 @@ import loginViaGoogle from './scripts/loginViaGoogle';
 import createEndScreens from './scripts/createEndScreens';
 import { createTestEndScreenCampaignAndAction } from './mock';
 import { checkIsEndScreenCampaignMarkedAsCancelled } from './lib/api';
-
+import logger from './lib/dataDogLogHelper'
 
 
 const { filterConsoleErrorNetworkInterrupts } = require('@etidbury/helpers/util/puppeteer')
@@ -130,6 +130,8 @@ const init = async () => {
 
     } catch (err) {
         console.error('err', err)
+
+        await logger.error(`Failed to initialise - ${err && err.response && err.response.data ? JSON.stringify(err.response.data) : err.message}`, __filename)
 
         if (err && err.response && err.response.data) {
             console.error("Error response", err.response.data)

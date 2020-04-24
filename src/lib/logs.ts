@@ -1,6 +1,12 @@
 // let _logs: string[] = []
+
+import logger from './dataDogLogHelper'
+
 export const logEndScreenAction = (msg, shouldForwardToSlack?: boolean, forceForwardToSlack?: boolean, onComplete?: () => void | null) => {
     console.debug('logEndScreenAction()', msg)
+
+    // logger.info(`Test: ${msg}`, __filename)
+
     if (onComplete)
         onComplete()
 }

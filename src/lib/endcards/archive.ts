@@ -6,6 +6,9 @@ import { logEndScreenAction } from '../logs'
 import { checkIsSaveButtonDisabled } from '../endscreen';
 import { nudgeEditableElement } from './layout';
 
+import logger from '../../lib/dataDogLogHelper'
+
+
 let _to
 const _interceptEndCardSave = async (page: puppeteer.Page, endScreenCampaignItem: EndScreenItem) => {
 
@@ -34,6 +37,8 @@ const _interceptEndCardSave = async (page: puppeteer.Page, endScreenCampaignItem
                 return
             }
             _reject(new Error('_interceptEndCardSave(): timeout'))
+
+
         }, 10 * 1000)
 
 
@@ -92,12 +97,13 @@ const _interceptEndCardSave = async (page: puppeteer.Page, endScreenCampaignItem
         page.removeListener('request', onReq)
         page.on('request', onReq)
 
-        logEndScreenAction('Clicking save for archiving')
+        //logEndScreenAction('Clicking save for archiving')
         await page.click(BTN_SAVE_SELECTOR)
 
     })
 
-    console.debug('_interceptEndCardSave():', 'finished')
+
+    await logger.debug(`_interceptEndCardSave(): finished`, __filename)
 
 }
 
@@ -111,13 +117,14 @@ const _triggerEnableEndCardSaving = async (page: puppeteer.Page) => {
 
 
     if (afterNetworkIdleInnerText.indexOf(TEXT_SNIPPET_IDENTIFY_ENDSCREEN_PAGE) <= -1) {
-        throw new Error('Current page does not seem to be expected Endscreen page')
+        throw new Error('_triggerEnableEndCardSaving(): Current page does not seem to be expected Endscreen page')
     }
 
 
     let editableElements = await page.$$(EDITABLE_ELEMENT_SELECTOR)
 
-    logEndScreenAction(`_triggerEnableEndCardSaving(): Found ${editableElements.length} end card elements`)
+    // logEndScreenAction(`_triggerEnableEndCardSaving(): Found ${editableElements.length} end card elements`)
+    await logger.debug(`_triggerEnableEndCardSaving(): Found ${editableElements.length} end card elements`, __filename)
 
     if (editableElements.length) {
 
@@ -130,13 +137,14 @@ const _triggerEnableEndCardSaving = async (page: puppeteer.Page) => {
         const isSaveBtnDisabled = await checkIsSaveButtonDisabled(page)
 
         if (isSaveBtnDisabled) {
+
             throw new Error('_triggerEnableEndCardSaving(): Failed to trigger enable saving. Save button still disabled')
         }
 
 
 
     } else {
-        console.warn("No editable elements to archive.")
+        await logger.debug("_triggerEnableEndCardSaving(): No editable elements to archive.", __filename)
     }
 
 
@@ -144,7 +152,6 @@ const _triggerEnableEndCardSaving = async (page: puppeteer.Page) => {
 
 
 export const createEndScreenArchive = async (page: puppeteer.Page, endScreenCampaignItem: EndScreenItem) => {
-
 
     try {
 
@@ -158,6 +165,7 @@ export const createEndScreenArchive = async (page: puppeteer.Page, endScreenCamp
 
     } catch (err) {
         console.warn("Failed to archive end card")
+        await logger.warn(`createEndScreenArchive():  Failed to archive end card: ${err.message}`, __filename)
     }
 
 }

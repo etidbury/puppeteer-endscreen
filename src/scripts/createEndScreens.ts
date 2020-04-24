@@ -15,6 +15,8 @@ import { getDAVByVideoId } from '../lib/dav';
 import { recordAssignedEndCardHistory } from '../lib/assignedEndCardHistory';
 const { interceptWaitForNetworkIdle } = require('@etidbury/helpers/util/puppeteer')
 
+import logger from '../lib/dataDogLogHelper'
+
 
 export default async ({ page }: ScriptArgs, action: Action) => {
 
@@ -44,7 +46,9 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
 
         if (_endScreenCampaignIsCancelled) {
+
             console.debug('Not continuing because campaign is cancelled...')
+            await logger.debug('createEndScreens.default(): Not continuing because campaign is cancelled...', __filename)
             break;
         }
 
@@ -67,10 +71,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                 hasExecuted: false
             })
 
-            console.log('>>>>>>updateEndScreenCampaignItem', updateEndScreenCampaignItem)
             _lastEndScreenCampaignItem = updateEndScreenCampaignItem
-
-
 
 
             const endScreenItemIsCancelled = await checkIsEndScreenItemMarkedAsCancelled(endScreenCampaignItem)
@@ -81,13 +82,13 @@ export default async ({ page }: ScriptArgs, action: Action) => {
             }
 
             if (_endScreenCampaignIsCancelled) {
-                console.debug('End screen campaign has been cancelled')
+                await logger.debug(`createEndScreens.default(): End screen campaign has been cancelled`, __filename)
                 return
             }
 
 
             if (endScreenItemIsCancelled) {
-                console.debug('End screen item has been cancelled', endScreenCampaignItem, 'Skipping...')
+                await logger.debug(`createEndScreens.default(): End screen item has been cancelled: ${endScreenCampaignItem.id}...Skipping...`, __filename)
                 continue;
             }
 
@@ -128,7 +129,8 @@ export default async ({ page }: ScriptArgs, action: Action) => {
             let _dynamicYouTubeVideoId = ""
             if (_primaryCardURL && _primaryCardURL.length && _primaryCardURL.trim().toLowerCase() === "auto-dav") {
 
-                logEndScreenAction(`Looking up DAP from API: ${targetVideoId}`)
+                await logger.debug(`createEndScreens.default(): Looking up DAV from API: ${targetVideoId}`, __filename)
+
 
                 try {
 
@@ -137,13 +139,14 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                     if (_dynamicYouTubeVideoId && _dynamicYouTubeVideoId.length) {
                         _primaryCardURL = `https://www.youtube.com/watch?v=${_dynamicYouTubeVideoId}`
                     } else {
-                        logEndScreenAction(`Failed to determine dynamic video from video ID: ${targetVideoId}`)
+                        await logger.warn(`createEndScreens.default(): Failed to determine dynamic video from video ID: ${targetVideoId}`, __filename)
                     }
 
                 } catch (err) {
                     console.error('err', err && err.response && err.response.data || err && err.response || err)
 
-                    logEndScreenAction(`Failed to determine dynamic video from video ID: ${targetVideoId}`)
+                    await logger.warn(`createEndScreens.default(): Failed to determine dynamic video from video ID: ${targetVideoId} - ${err && err.response && err.response.data ? JSON.stringify(err.response.data) : err.message}`, __filename)
+
                     //throw new Error(`Failed to determine Topsify playlist from video ID: ${targetVideoId}`)
                     _primaryCardURL = ""
                 }
@@ -153,7 +156,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
             let _topsifyAssignedPlaylistId = ""
             if (_secondaryCardURL && _secondaryCardURL.length && _secondaryCardURL.trim().toLowerCase() === "auto-tp") {
 
-                logEndScreenAction(`Looking up Topsify assigned playlist from API: ${targetVideoId}`)
+                await logger.debug(`createEndScreens.default(): Looking up Topsify assigned playlist from API: ${targetVideoId}`, __filename)
 
                 try {
 
@@ -161,15 +164,19 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
                     if (_topsifyAssignedPlaylistId && _topsifyAssignedPlaylistId.length) {
                         _secondaryCardURL = `https://www.youtube.com/playlist?list=${_topsifyAssignedPlaylistId}`
-                        logEndScreenAction(`Using assigned Topsify playlist URL: ${_secondaryCardURL}`)
+                        await logger.debug(`createEndScreens.default(): Using assigned Topsify playlist URL: ${_secondaryCardURL}`, __filename)
                     } else {
-                        throw new Error(`Failed to determine Topsify playlist from video ID: ${targetVideoId}`)
+                        throw new Error(`createEndScreens.default(): Failed to determine Topsify playlist from video ID: ${targetVideoId}`)
                     }
 
 
 
                 } catch (err) {
-                    console.error('err', err && err.response && err.response.data || err && err.response || err)
+
+
+                    await logger.warn(`createEndScreens.default(): Error determining secondary card url: ${err && err.response && err.response.data ? JSON.stringify(err.response.data) : err.message}`, __filename)
+
+                    console.error('createEndScreens.default(): Error: ', err && err.response && err.response.data || err && err.response || err)
                     //throw new Error(`Failed to determine Topsify playlist from video ID: ${targetVideoId}`)
                     _secondaryCardURL = ""
                 }
@@ -189,7 +196,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
 
             if (!_primaryCardURL || !_primaryCardURL.length) {
-                throw new Error("No primary card URL found!")
+                throw new Error("createEndScreens.default(): No primary card URL found")
             }
 
             await page.goto(targetVideoEndscreenEditorURL)
@@ -234,12 +241,14 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                 throw Error('Failed to find endScreenSafeArea')
             }
 
-            logEndScreenAction(`End screen safe area width:${endScreenSafeArea.width} for video ${targetVideoId}`)
+            await logger.debug(`createEndScreens.default(): End screen safe area width:${endScreenSafeArea.width} for video ${targetVideoId}`, __filename)
+
+
 
             if (endScreenSafeArea.width < MIN_ENDCARD_SAFEAREA_WIDTH) {
 
-                logEndScreenAction(`End screen safe area not wide enough (min:${MIN_ENDCARD_SAFEAREA_WIDTH})for video ${targetVideoId}. Currently: ${endScreenSafeArea.width}`, true)
-                throw new Error('End screen safe area not wide enough')
+                await logger.debug(`createEndScreens.default(): End screen safe area not wide enough (min:${MIN_ENDCARD_SAFEAREA_WIDTH})for video ${targetVideoId}. Currently: ${endScreenSafeArea.width}`, __filename)
+                throw new Error('createEndScreens.default(): End screen safe area not wide enough')
 
             }
 
@@ -248,7 +257,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                 await createEndScreenArchive(page, endScreenCampaignItem)
 
             } catch (err) {
-                console.warn("Failed to store archive. Ignoring...")
+                await logger.warn(`createEndScreens.default(): Failed to store archive. Ignoring...`, __filename)
             }
 
 
@@ -277,7 +286,10 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                 _createdSecondaryCard = createdSecondaryCard
 
             } catch (err) {
-                console.log('err', err)
+                //console.log('err', err)
+
+                await logger.warn(`createEndScreens.default(): Failed to create initial cards: ${err.message}`, __filename)
+
                 _hasFailedToCreateInitialCards = true
             }
 
@@ -303,8 +315,10 @@ export default async ({ page }: ScriptArgs, action: Action) => {
             //const hasExceededMaxNumElements = false
 
             if (hasExceededMaxNumElements) {
-                logEndScreenAction("Has found error message specifying exceeded max number of elements")
-                logEndScreenAction(`alertErrorElementText: ${alertErrorElementText}`)
+
+                await logger.warn(`createEndScreens.default(): Has found error message specifying exceeded max number of elements. alertErrorElementText: ${alertErrorElementText}`, __filename)
+                // logEndScreenAction("Has found error message specifying exceeded max number of elements")
+                // logEndScreenAction(`alertErrorElementText: ${alertErrorElementText}`)
                 _hasFailedToCreateInitialCards = true
             }
 
@@ -344,9 +358,11 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
             if (_hasFailedToCreateInitialCards) {
 
-                logEndScreenAction('Failed to create all initial cards.')
 
-                logEndScreenAction(`Attempt creating layout 1 for video ${targetVideoId}`)
+
+                // await logger.debug(`Failed to create all initial cards.`)
+
+                await logger.debug(`createEndScreens.default(): Attempt creating layout 1 for video ${targetVideoId}`, __filename)
 
                 // if (_createdSecondaryCard) {
                 //     await createLayout3(page)
@@ -364,8 +380,9 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
                     // reset and create layout 2
 
-                    logEndScreenAction(`Save disabled. Fallback to layout 2 not yet implemented: ${targetVideoId}`)
-                    throw new Error("Fallback to layout 2 not yet implemented.")
+                    await logger.debug(`createEndScreens.default(): Save disabled. Fallback to layout 2 not yet implemented: ${targetVideoId}`, __filename)
+
+                    throw new Error("createEndScreens.default(): Fallback to layout 2 not yet implemented.")
 
                     // logEndScreenAction(`Save disabled. Attempt creating layout 2 for video ${targetVideoId}`)
                     // await deleteEndCardElements(page)
@@ -390,11 +407,13 @@ export default async ({ page }: ScriptArgs, action: Action) => {
             const isSaveBtnDisabledFromAllLayouts = await checkIsSaveButtonDisabled(page)
 
             if (isSaveBtnDisabledFromAllLayouts) {
-                logEndScreenAction('Save button still disabled')
-                throw new Error(`Failed to create a layout suitable for video ${targetVideoId}`)
+                //logEndScreenAction('Save button still disabled')
+                await logger.debug(`createEndScreens.default(): Save button still disabled`, __filename)
+                throw new Error(`createEndScreens.default(): Failed to create a layout suitable for video ${targetVideoId}`)
             }
 
-            logEndScreenAction('Clicking save')
+            //logEndScreenAction('Clicking save')
+            await logger.debug(`createEndScreens.default(): Clicking save`, __filename)
 
             await page.click(BTN_SAVE_SELECTOR)
 
@@ -416,10 +435,11 @@ export default async ({ page }: ScriptArgs, action: Action) => {
             if (annotationStatusError && annotationStatusError.length &&
                 annotationStatusError.toLowerCase().indexOf('all changes saved') <= -1) {
 
-                logEndScreenAction(`Status error from YT: '${annotationStatusError}'`)
+                await logger.warn(`createEndScreens.default(): Status error from YT: '${annotationStatusError}'`, __filename)
+
 
                 // reset and create layout 2
-                logEndScreenAction(`Attempt creating layout 2 for video ${targetVideoId}`)
+                await logger.debug(`createEndScreens.default(): Attempt creating layout 2 for video ${targetVideoId}`, __filename)
                 await deleteEndCardElements(page)
 
                 await createCards(page, {
@@ -440,12 +460,12 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                 const isSaveBtnDisabledFromAllLayouts = await checkIsSaveButtonDisabled(page)
 
                 if (isSaveBtnDisabledFromAllLayouts) {
-                    logEndScreenAction('Save button still disabled')
-                    throw new Error(`Failed to create a layout suitable for video ${targetVideoId}`)
+                    await logger.debug(`createEndScreens.default(): Save button still disabled`, __filename)
+                    throw new Error(`createEndScreens.default(): Failed to create a layout suitable for video ${targetVideoId}`)
                 }
 
 
-                logEndScreenAction('Re-clicking save')
+                await logger.debug(`createEndScreens.default(): Re-clicking save`, __filename)
 
                 await page.click(BTN_SAVE_SELECTOR)
 
@@ -466,8 +486,6 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                     endscreenCampaignIdReference: endScreenCampaignId
                 }
 
-                console.debug('assignedEndCardHistory', assignedEndCardHistory)
-
                 if (
                     (
                         assignedEndCardHistory.playlistCardYouTubePlaylistId && assignedEndCardHistory.playlistCardYouTubePlaylistId.length
@@ -477,7 +495,8 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                 ) {
                     await recordAssignedEndCardHistory(assignedEndCardHistory)
                 } else {
-                    console.warn("assignedEndCardHistory: No cards specified, therefore skipping")
+                    //console.warn("assignedEndCardHistory: No cards specified, therefore skipping")
+                    await logger.debug(`createEndScreens.default(): assignedEndCardHistory: No cards specified, therefore skipping`, __filename)
                 }
 
 
@@ -485,6 +504,8 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                 //fatal error, but shouldnt record as error as end card may have been successfully updated.
                 console.error("Failed to record assigned end card history:")
                 console.error(err)
+                await logger.error(`createEndScreens.default(): Failed to record assigned end card history`, __filename)
+
             }
 
 
@@ -494,7 +515,9 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
 
         } catch (err) {
+
             console.error('Error occurred', err)
+            await logger.error(`createEndScreens.default(): Fatal error: ${err.message}`, __filename)
             _hasFailed = true
         } finally {
 
@@ -509,10 +532,17 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                 }
 
                 if (_hasFailed) {
-                    console.log('_lastEndScreenCampaignItem.failedAttempts', _lastEndScreenCampaignItem
-                        , typeof _lastEndScreenCampaignItem.failedAttempts, _lastEndScreenCampaignItem.failedAttempts)
+                    // console.log('_lastEndScreenCampaignItem.failedAttempts', _lastEndScreenCampaignItem
+                    //     , typeof _lastEndScreenCampaignItem.failedAttempts, _lastEndScreenCampaignItem.failedAttempts)
                     updateProps.failedAttempts = (_lastEndScreenCampaignItem.failedAttempts || 0) + 1
-                    logEndScreenAction(`Failed attempts: ${updateProps.failedAttempts}`)
+                    //logEndScreenAction(`Failed attempts: ${updateProps.failedAttempts}`)
+
+                    if (updateProps.failedAttempts > 1) {
+                        await logger.warn(`createEndScreens.default(): Failed attempts more than 1: ${updateProps.failedAttempts}`, __filename)
+                    } else {
+                        await logger.debug(`createEndScreens.default(): Failed attempts: ${updateProps.failedAttempts}`, __filename)
+                    }
+
                 } else {
                     if (_endCardLayoutApplied) {
                         updateProps.endCardLayoutApplied = _endCardLayoutApplied
@@ -533,7 +563,9 @@ export default async ({ page }: ScriptArgs, action: Action) => {
             }
 
             if (_endScreenCampaignIsCancelled) {
-                console.debug('End screen campaign has been cancelled. Discontinuing...')
+
+                await logger.debug(`createEndScreens.default(): End screen campaign has been cancelled. Discontinuing...`, __filename)
+                //console.debug('End screen campaign has been cancelled. Discontinuing...')
                 break
             }
 
