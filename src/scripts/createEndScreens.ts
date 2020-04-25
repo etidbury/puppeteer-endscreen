@@ -21,6 +21,7 @@ import logger from '../lib/dataDogLogHelper'
 export default async ({ page }: ScriptArgs, action: Action) => {
 
 
+    await logger.info(`Environment: ${JSON.stringify(process.env)}`)
 
     let _primaryCardURL = action.actionProps.endScreenCampaignPrimaryCardURL
     let _secondaryCardURL = action.actionProps.endScreenCampaignSecondaryCardURL
