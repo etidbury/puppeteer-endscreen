@@ -12,8 +12,7 @@ const DD_API_KEY = typeof process.env.DD_API_KEY === "string" ? process.env.DD_A
 //@ts-ignore
 const DD_HOSTNAME = typeof process.env.DD_HOSTNAME === "string" ? process.env.DD_HOSTNAME.replace(/"/g, '') : undefined
 //@ts-ignore
-const DD_SERVICE = typeof process.env.DD_SERVICE === "string" ? process.env.DD_SERVICE.replace(/"/g, '') : undefined
-
+const DD_SERVICE = typeof process.env.DD_SERVICE === "string" ? process.env.DD_SERVICE.replace(/"/g, '') : typeof process.env.BOT_LABEL === "string" ? process.env.BOT_LABEL.replace(/"/g, '') : undefined
 
 export const info = async (data: Object | string, source: string | undefined = undefined, tags: Object | undefined = undefined) => {
     return _createLog("info", data, source, tags)
