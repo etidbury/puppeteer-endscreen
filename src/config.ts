@@ -45,7 +45,7 @@ export const BTN_SAVE_SELECTOR = '#save-button'
 
 export const ENDCARD_SAFE_AREA_SELECTOR = '#tap-area'
 
-export const MIN_ENDCARD_SAFEAREA_WIDTH = 390
+export const MIN_ENDCARD_SAFEAREA_WIDTH = 330
 /**
  * Whether to repeat list of video entries. 
  * (e.g. video list is 100, REPEAT_VIDEO_ENTRIES = 5 means video list will be 500)
