@@ -78,10 +78,6 @@ export const createCards = async (page: puppeteer.Page, { primaryCardURL, primar
 
     let _createdSecondaryCard = false
 
-    //todo: testing,remove after use
-    secondaryCard = false
-
-
     if (primaryCard) {
 
         //logEndScreenAction('Create primary card element: primaryCardURL - Processing...')
