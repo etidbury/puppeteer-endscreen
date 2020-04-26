@@ -3,7 +3,7 @@ import Axios from 'axios'
 import * as urljoin from 'url-join'
 
 //const BASE_API_URL = 'http://localhost:3000/'
-const BASE_API_URL = 'https://wmg-youtube-playlist-api.now.sh'
+const BASE_API_URL = 'https://production.wmg-youtube-playlist-api.firepitapi.com'
 
 export const recordAssignedEndCardHistory = async (assignedEndCardHistory: {
     targetYouTubeVideoId: string,
