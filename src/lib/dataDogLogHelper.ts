@@ -1,9 +1,9 @@
-require('dotenv').config({
-    safe: true,
-    debug: process.env.DEBUG,
-    allowEmptyValues: true,
-    silent: true
-})
+// require('dotenv').config({
+//     safe: true,
+//     debug: process.env.DEBUG,
+//     allowEmptyValues: true,
+//     silent: true
+// })
 
 import Axios from 'axios'
 

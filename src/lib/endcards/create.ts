@@ -78,6 +78,10 @@ export const createCards = async (page: puppeteer.Page, { primaryCardURL, primar
 
     let _createdSecondaryCard = false
 
+    //todo: testing,remove after use
+    secondaryCard = false
+
+
     if (primaryCard) {
 
         //logEndScreenAction('Create primary card element: primaryCardURL - Processing...')
@@ -120,11 +124,10 @@ export const createCards = async (page: puppeteer.Page, { primaryCardURL, primar
 
 
 
-
         await moveEditableElementToPosition(
             page,
             await _getLastCreatedEndCardElement(page),
-            EndCardPosition.TOP_RIGHT
+            secondaryCard ? EndCardPosition.TOP_RIGHT : EndCardPosition.MIDDLE_RIGHT
         )
 
         await logger.debug(`createCards(): Create Primary End Card element: Complete`, __filename)
