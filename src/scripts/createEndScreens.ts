@@ -224,7 +224,9 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
             //open endscreen editor modal
             await page.click(BTN_ENDSCREEN_EDITOR_OPEN_SELECTOR)
-            await page.waitFor(2 * 1000)
+
+
+            await interceptWaitForNetworkIdle(page, 5 * 1000)
 
 
             //createEndScreenArchiveIfNotExists
