@@ -137,17 +137,25 @@ const init = async () => {
         process.exit(0)
 
     } catch (err) {
-        console.error('err', err)
+        try {
 
-        await logger.error(`Failed to initialise - ${err && err.response && err.response.data ? JSON.stringify(err.response.data) : err.message}`, __filename)
 
-        if (err && err.response && err.response.data) {
-            console.error("Error response", err.response.data)
-        } else {
-            console.error("Error", err)
+            console.error('err', err)
+
+            await logger.error(`Failed to initialise - ${err && err.response && err.response.data ? JSON.stringify(err.response.data) : err.message}`, __filename)
+
+            if (err && err.response && err.response.data) {
+                console.error("Error response", err.response.data)
+            } else {
+                console.error("Error", err)
+            }
+
+
+            browser.close()
+        } catch (err) {
+            console.error("Fatal error upon caught: ", err)
         }
 
-        browser.close()
         process.exit(1)
     }
 
