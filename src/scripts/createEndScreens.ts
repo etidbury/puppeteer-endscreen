@@ -328,7 +328,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
             //     }
             // )
 
-            const hasExceededMaxNumElements = alertErrorElementText.length
+            const hasExceededMaxNumElements = alertErrorElementText.length && alertErrorElementText.indexOf("exceeds") > -1
 
             //const hasExceededMaxNumElements = false
 
@@ -373,124 +373,137 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
 
 
-
-            if (_hasFailedToCreateInitialCards) {
-
-
-
-                // await logger.debug(`Failed to create all initial cards.`)
-
-                await logger.debug(`createEndScreens.default(): Attempt creating layout 1 for video ID: ${targetVideoId}`, __filename)
-
-                // if (_createdSecondaryCard) {
-                //     await createLayout3(page)
-                //     _endCardLayoutApplied = 'layout_3b'
-                // } else {
-                await createLayout1(page)
-                _endCardLayoutApplied = 'layout_1b'
+            //disable attempt other layouts
+            if (false) {
 
 
-                const isSaveBtnDisabledFromLayout1 = await checkIsSaveButtonDisabled(page)
+
+                if (_hasFailedToCreateInitialCards) {
 
 
-                if (isSaveBtnDisabledFromLayout1) {
+
+                    // await logger.debug(`Failed to create all initial cards.`)
+
+                    await logger.debug(`createEndScreens.default(): Attempt creating layout 1 for video ID: ${targetVideoId}`, __filename)
+
+                    // if (_createdSecondaryCard) {
+                    //     await createLayout3(page)
+                    //     _endCardLayoutApplied = 'layout_3b'
+                    // } else {
+                    await createLayout1(page)
+                    _endCardLayoutApplied = 'layout_1b'
 
 
-                    // reset and create layout 2
+                    const isSaveBtnDisabledFromLayout1 = await checkIsSaveButtonDisabled(page)
 
-                    await logger.debug(`createEndScreens.default(): Save disabled. Fallback to layout 2 not yet implemented for video ID: ${targetVideoId}`, __filename)
 
-                    throw new Error(`createEndScreens.default(): Fallback to layout 2 not yet implemented. Video ID: ${targetVideoId}`)
+                    if (isSaveBtnDisabledFromLayout1) {
 
-                    // logEndScreenAction(`Save disabled. Attempt creating layout 2 for video ${targetVideoId}`)
-                    // await deleteEndCardElements(page)
 
-                    // await createCards(page, {
-                    //     primaryCardURL: _primaryCardURL,
-                    //     primaryCard: true,
-                    //     bestForViewerCard: true,
-                    //     subscribeCard: false, //dont add subscribe button,
-                    //     secondaryCard: false
-                    // })
+                        // reset and create layout 2
 
-                    // await page.waitFor(5 * 1000)
+                        await logger.debug(`createEndScreens.default(): Save disabled. Fallback to layout 2 not yet implemented for video ID: ${targetVideoId}`, __filename)
 
-                    // await createLayout2(page)
+                        throw new Error(`createEndScreens.default(): Fallback to layout 2 not yet implemented. Video ID: ${targetVideoId}`)
 
-                    // _endCardLayoutApplied = 'layout_2b'
+                        // logEndScreenAction(`Save disabled. Attempt creating layout 2 for video ${targetVideoId}`)
+                        // await deleteEndCardElements(page)
+
+                        // await createCards(page, {
+                        //     primaryCardURL: _primaryCardURL,
+                        //     primaryCard: true,
+                        //     bestForViewerCard: true,
+                        //     subscribeCard: false, //dont add subscribe button,
+                        //     secondaryCard: false
+                        // })
+
+                        // await page.waitFor(5 * 1000)
+
+                        // await createLayout2(page)
+
+                        // _endCardLayoutApplied = 'layout_2b'
+                    }
                 }
-            }
-
-
-            const isSaveBtnDisabledFromAllLayouts = await checkIsSaveButtonDisabled(page)
-
-            if (isSaveBtnDisabledFromAllLayouts) {
-                //logEndScreenAction('Save button still disabled')
-                await logger.debug(`createEndScreens.default(): Save button still disabled for video ID: ${targetVideoId}`, __filename)
-                throw new Error(`createEndScreens.default(): Failed to create a layout suitable for video ID: ${targetVideoId}`)
-            }
-
-            //logEndScreenAction('Clicking save')
-            await logger.debug(`createEndScreens.default(): Clicking save for video ID: ${targetVideoId}`, __filename)
-
-            await page.click(BTN_SAVE_SELECTOR)
-
-
-
-
-            await interceptWaitForNetworkIdle(page, 5 * 1000)
-
-
-            const annotationStatusError = await page.evaluate(
-                () => {
-                    const el = document.querySelector('.annotator-status-save') as any
-
-                    return el && el.innerHTML
-                }
-            )
-
-
-            if (annotationStatusError && annotationStatusError.length &&
-                annotationStatusError.toLowerCase().indexOf('all changes saved') <= -1) {
-
-                await logger.warn(`createEndScreens.default(): Status error from YT: '${annotationStatusError}' for video ID: ${targetVideoId}`, __filename)
-
-
-                // reset and create layout 2
-                await logger.debug(`createEndScreens.default(): Attempt creating layout 2 for video ID: ${targetVideoId}`, __filename)
-                await deleteEndCardElements(page)
-
-                await createCards(page, {
-                    primaryCardURL: _primaryCardURL,
-                    primaryCard: true,
-                    bestForViewerCard: true,
-                    subscribeCard: false, //dont add subscribe button,
-                    secondaryCard: false
-                })
-
-                await page.waitFor(5 * 1000)
-
-                await createLayout2(page)
-
-                _endCardLayoutApplied = 'layout_2b'
 
 
                 const isSaveBtnDisabledFromAllLayouts = await checkIsSaveButtonDisabled(page)
 
                 if (isSaveBtnDisabledFromAllLayouts) {
+                    //logEndScreenAction('Save button still disabled')
                     await logger.debug(`createEndScreens.default(): Save button still disabled for video ID: ${targetVideoId}`, __filename)
                     throw new Error(`createEndScreens.default(): Failed to create a layout suitable for video ID: ${targetVideoId}`)
                 }
 
-
-                await logger.debug(`createEndScreens.default(): Re-clicking save for video ID: ${targetVideoId}`, __filename)
+                //logEndScreenAction('Clicking save')
+                await logger.debug(`createEndScreens.default(): Clicking save for video ID: ${targetVideoId}`, __filename)
 
                 await page.click(BTN_SAVE_SELECTOR)
 
 
 
-                //throw new Error(`Status error from YT: '${annotationStatusError}'`)
+
+                await interceptWaitForNetworkIdle(page, 5 * 1000)
+
+
+                const annotationStatusError = await page.evaluate(
+                    () => {
+                        const el = document.querySelector('.annotator-status-save') as any
+
+                        return el && el.innerHTML
+                    }
+                )
+
+
+                if (annotationStatusError && annotationStatusError.length &&
+                    annotationStatusError.toLowerCase().indexOf('all changes saved') <= -1) {
+
+                    await logger.warn(`createEndScreens.default(): Status error from YT: '${annotationStatusError}' for video ID: ${targetVideoId}`, __filename)
+
+
+                    // reset and create layout 2
+                    await logger.debug(`createEndScreens.default(): Attempt creating layout 2 for video ID: ${targetVideoId}`, __filename)
+                    await deleteEndCardElements(page)
+
+                    await createCards(page, {
+                        primaryCardURL: _primaryCardURL,
+                        primaryCard: true,
+                        bestForViewerCard: true,
+                        subscribeCard: false, //dont add subscribe button,
+                        secondaryCard: false
+                    })
+
+                    await page.waitFor(5 * 1000)
+
+                    await createLayout2(page)
+
+                    _endCardLayoutApplied = 'layout_2b'
+
+
+                    const isSaveBtnDisabledFromAllLayouts = await checkIsSaveButtonDisabled(page)
+
+                    if (isSaveBtnDisabledFromAllLayouts) {
+                        await logger.debug(`createEndScreens.default(): Save button still disabled for video ID: ${targetVideoId}`, __filename)
+                        throw new Error(`createEndScreens.default(): Failed to create a layout suitable for video ID: ${targetVideoId}`)
+                    }
+
+
+                    await logger.debug(`createEndScreens.default(): Re-clicking save for video ID: ${targetVideoId}`, __filename)
+
+                    await page.click(BTN_SAVE_SELECTOR)
+
+
+
+                    //throw new Error(`Status error from YT: '${annotationStatusError}'`)
+                }
             }
+
+
+
+
+            await logger.debug(`createEndScreens.default(): Clicking save for video ID: ${targetVideoId}`, __filename)
+
+            await page.click(BTN_SAVE_SELECTOR)
+
 
             let assignedEndCardHistory
 
