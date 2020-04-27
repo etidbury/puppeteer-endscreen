@@ -204,6 +204,23 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
 
 
+            //check endscreen is an option/disabled
+            const isEndScreenEditorLinkDisabledOrError = await page.evaluate(() => {
+
+                try {
+                    //@ts-ignore
+                    return document.querySelector('#endscreen-editor-link').querySelector('.ytcp-text-dropdown-trigger').hasAttribute('disabled')
+                } catch (err) {
+                    console.error("Error", err)
+                    return true
+                }
+            })
+
+            if (isEndScreenEditorLinkDisabledOrError) {
+                await logger.debug(`createEndScreens.default(): Endscreen not supported for video ID: ${targetVideoId}`)
+                continue;
+            }
+
 
             //open endscreen editor modal
             await page.click(BTN_ENDSCREEN_EDITOR_OPEN_SELECTOR)
