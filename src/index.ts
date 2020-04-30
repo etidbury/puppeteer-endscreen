@@ -114,14 +114,14 @@ const init = async () => {
 
         await loginViaGoogle({ browser, page }, action)
 
-        try {
+        //try {
 
 
-            await createEndScreens({ browser, page }, action)
+        await createEndScreens({ browser, page }, action)
 
-        } catch (err) {
-            await logger.error(`Create End Screens Failed - ${err && err.response && err.response.data ? JSON.stringify(err.response.data) : err.message}`, __filename)
-        }
+        // } catch (err) {
+        //     await logger.error(`Create End Screens Failed - ${err && err.response && err.response.data ? JSON.stringify(err.response.data) : err.message}`, __filename)
+        // }
 
 
         // if (filterConsoleErrorNetworkInterrupts(firedConsoleErrors).length) {
