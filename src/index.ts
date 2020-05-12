@@ -114,14 +114,15 @@ const init = async () => {
 
         await loginViaGoogle({ browser, page }, action)
 
-        //try {
+        //todo: suppress errors for first rollout to avoid re-run of failed. Remove try catch after use
+        try {
 
 
-        await createEndScreens({ browser, page }, action)
+            await createEndScreens({ browser, page }, action)
 
-        // } catch (err) {
-        //     await logger.error(`Create End Screens Failed - ${err && err.response && err.response.data ? JSON.stringify(err.response.data) : err.message}`, __filename)
-        // }
+        } catch (err) {
+            await logger.error(`Create End Screens Failed - ${err && err.response && err.response.data ? JSON.stringify(err.response.data) : err.message}`, __filename)
+        }
 
 
         // if (filterConsoleErrorNetworkInterrupts(firedConsoleErrors).length) {
