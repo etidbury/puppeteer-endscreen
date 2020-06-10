@@ -126,7 +126,39 @@ export default async ({ page }: ScriptArgs, action: Action) => {
 
 
             let _dynamicYouTubeVideoId = ""
-            if (_primaryCardURL && _primaryCardURL.length && _primaryCardURL.trim().toLowerCase() === "auto-dav") {
+
+            let _topsifyAssignedPlaylistId = ""
+            if (_primaryCardURL && _primaryCardURL.length && _primaryCardURL.trim().toLowerCase() === "auto-tp") {
+
+                await logger.debug(`createEndScreens.default(): Looking up Topsify assigned playlist from API: ${targetVideoId}`, __filename)
+
+                try {
+
+                    _topsifyAssignedPlaylistId = await getTopsifyAssignedPlaylistId(targetVideoId)
+
+                    if (_topsifyAssignedPlaylistId && _topsifyAssignedPlaylistId.length) {
+                        _primaryCardURL = `https://www.youtube.com/playlist?list=${_topsifyAssignedPlaylistId}`
+                        await logger.debug(`createEndScreens.default(): Using assigned Topsify playlist URL: ${_primaryCardURL}`, __filename)
+                    } else {
+                        throw new Error(`createEndScreens.default(): Failed to determine Topsify playlist from video ID: ${targetVideoId}`)
+                    }
+
+
+
+                } catch (err) {
+
+
+                    await logger.warn(`createEndScreens.default(): Error determining secondary card url for video ID: ${targetVideoId}: ${err && err.response && err.response.data ? JSON.stringify(err.response.data) : err.message}`, __filename)
+
+                    console.error('createEndScreens.default(): Error: ', err && err.response && err.response.data || err && err.response || err)
+                    //throw new Error(`Failed to determine Topsify playlist from video ID: ${targetVideoId}`)
+                    _primaryCardURL = ""
+                }
+
+            }
+
+
+            if (_secondaryCardURL && _secondaryCardURL.length && _secondaryCardURL.trim().toLowerCase() === "auto-dav") {
 
                 await logger.debug(`createEndScreens.default(): Looking up DAV from API: ${targetVideoId}`, __filename)
 
@@ -136,7 +168,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
                     _dynamicYouTubeVideoId = await getDAVByVideoId(targetVideoId)
 
                     if (_dynamicYouTubeVideoId && _dynamicYouTubeVideoId.length) {
-                        _primaryCardURL = `https://www.youtube.com/watch?v=${_dynamicYouTubeVideoId}`
+                        _secondaryCardURL = `https://www.youtube.com/watch?v=${_dynamicYouTubeVideoId}`
                     } else {
                         await logger.warn(`createEndScreens.default(): Failed to determine dynamic video from video ID: ${targetVideoId}`, __filename)
                     }
@@ -152,35 +184,7 @@ export default async ({ page }: ScriptArgs, action: Action) => {
             }
 
 
-            let _topsifyAssignedPlaylistId = ""
-            if (_secondaryCardURL && _secondaryCardURL.length && _secondaryCardURL.trim().toLowerCase() === "auto-tp") {
 
-                await logger.debug(`createEndScreens.default(): Looking up Topsify assigned playlist from API: ${targetVideoId}`, __filename)
-
-                try {
-
-                    _topsifyAssignedPlaylistId = await getTopsifyAssignedPlaylistId(targetVideoId)
-
-                    if (_topsifyAssignedPlaylistId && _topsifyAssignedPlaylistId.length) {
-                        _secondaryCardURL = `https://www.youtube.com/playlist?list=${_topsifyAssignedPlaylistId}`
-                        await logger.debug(`createEndScreens.default(): Using assigned Topsify playlist URL: ${_secondaryCardURL}`, __filename)
-                    } else {
-                        throw new Error(`createEndScreens.default(): Failed to determine Topsify playlist from video ID: ${targetVideoId}`)
-                    }
-
-
-
-                } catch (err) {
-
-
-                    await logger.warn(`createEndScreens.default(): Error determining secondary card url for video ID: ${targetVideoId}: ${err && err.response && err.response.data ? JSON.stringify(err.response.data) : err.message}`, __filename)
-
-                    console.error('createEndScreens.default(): Error: ', err && err.response && err.response.data || err && err.response || err)
-                    //throw new Error(`Failed to determine Topsify playlist from video ID: ${targetVideoId}`)
-                    _secondaryCardURL = ""
-                }
-
-            }
 
 
             /**
